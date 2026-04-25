@@ -1,8 +1,8 @@
 <<<<<<< HEAD
-# PRJ.POO-Diamund-Rush
+# PRJ.POO-Relic-Hunter
 Éste repositorio é um projeto de POO, que consiste na criação de um jogo baseado no Diamund Rush.
 =======
-# YourProjectName
+# Relic Hunter
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
