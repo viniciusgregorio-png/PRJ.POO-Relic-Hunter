@@ -1,6 +1,7 @@
-package io.github.relichunter.lwjgl3;
+package io.github.relichunter;
 
 import com.badlogic.gdx.Game;
+import io.github.relichunter.screens.SplashScreen;
 
 public class Main extends Game {
 

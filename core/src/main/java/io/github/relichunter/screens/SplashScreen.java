@@ -1,4 +1,4 @@
-package io.github.relichunter.lwjgl3;
+package io.github.relichunter.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import io.github.relichunter.Main;
 
 public class SplashScreen implements Screen {
 
