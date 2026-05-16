@@ -56,7 +56,7 @@ configure(subprojects) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'Diamond Rush'
+  ext.appName = 'Relic Hunter'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.
@@ -66,4 +66,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'Diamond Rush' + '-parent'
+eclipse.project.name = 'Relic Hunter' + '-parent'

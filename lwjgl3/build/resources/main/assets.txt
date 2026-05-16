@@ -1,1 +1,2 @@
-DiamondRush.png
+audioInicialTopGear.mp3
+logoRelic.png
