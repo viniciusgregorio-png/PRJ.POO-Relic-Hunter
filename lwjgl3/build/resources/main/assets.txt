@@ -1,2 +1,5 @@
+AnimationSheet_Character.png
 audioInicialTopGear.mp3
+chao.png
 logoRelic.png
+parede.png

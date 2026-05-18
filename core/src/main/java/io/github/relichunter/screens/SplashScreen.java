@@ -55,7 +55,7 @@ public class SplashScreen implements Screen {
         batch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new TelaTeste(game));
             dispose();
         }
     }
