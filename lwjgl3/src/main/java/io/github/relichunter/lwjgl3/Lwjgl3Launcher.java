@@ -12,7 +12,7 @@ public class Lwjgl3Launcher {
         Object[] options = {"Sim", "Não"};
         int choice = JOptionPane.showOptionDialog(null,
             "Deseja iniciar o Relic Hunter?",
-            "Inicialização do jogo...",
+            "Inicialização do jogo",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.QUESTION_MESSAGE,
             null, options, options[0]);
