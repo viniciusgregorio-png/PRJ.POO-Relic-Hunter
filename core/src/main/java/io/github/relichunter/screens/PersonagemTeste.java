@@ -130,7 +130,15 @@ public class PersonagemTeste {
         // Agora desenha diretamente nas coordenadas float X e Y livres
         batch.draw(frameAtual, posX, posY, MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
     }
-
+    public Rectangle getCaixaPersonagem() {
+        return caixaPersonagem;
+    }
+    public float getPosX() {
+        return posX;
+    }
+    public float getPosY(){
+        return posY;
+    }
     public void dispose() {
         spriteSheet.dispose();
     }
