@@ -8,33 +8,34 @@ import io.github.relichunter.screens.PersonagemTeste;
 public class PedraQueCai extends Obstaculo{
     private ShapeRenderer shapeRenderer;
     private PersonagemTeste personagem;
-    private int blocoAnterior;
     private boolean estaCaindo;
-    private int intervaloDaPedraQueCai;
-    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem) {
+    private MapaTeste mapa;
+    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa) {
         this.x = x;
         this.y = y;
         this.largura = largura;
         this.altura = altura;
         this.estaCaindo = false;
-        this.intervaloDaPedraQueCai = 0;
         this.personagem = personagem;
-        this.blocoAnterior = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
         this.shapeRenderer = new ShapeRenderer();
+        this.mapa = mapa;
     }
     @Override
     public void update(float delta){
-        int blocoAtual = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
-        if (blocoAtual != blocoAnterior){
-            intervaloDaPedraQueCai = intervaloDaPedraQueCai + 1;
-            blocoAnterior = blocoAtual;
-        }
-        if (intervaloDaPedraQueCai >= 4) {
+        int colunaPedra = (int) (x / MapaTeste.TAMANHO_BLOCO);
+        int colunaPersonagem = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
+        if (colunaPedra == colunaPersonagem) {
             estaCaindo = true;
-            intervaloDaPedraQueCai = 0;
         }
-        if (estaCaindo == true){
+        if (estaCaindo) {
             y -= 150 * delta;
+
+            int coluna = (int) (x / MapaTeste.TAMANHO_BLOCO);
+            int linhaAbaixo = (int) ((y - 1) / MapaTeste.TAMANHO_BLOCO);
+
+            if (!mapa.isEspacoLivre(coluna, linhaAbaixo)) {
+                estaCaindo = false;
+            }
         }
     }
 
