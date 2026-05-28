@@ -47,16 +47,14 @@ public class TelaTeste implements Screen {
         camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0);
         // 3 rubis em posições diferentes do mapa
         rubis = new Rubi[3];
-        rubis[0] = new Rubi(32, 256, 32, 32, personaje);
-        rubis[1] = new Rubi(96, 256, 32, 32, personaje);
-        rubis[2] = new Rubi(160, 256, 32, 32, personaje);
+        rubis[0] = new Rubi(160, 64, 28, 28, personaje);
+        rubis[1] = new Rubi(224, 64, 28, 28, personaje);
+        rubis[2] = new Rubi(288, 64, 28, 28, personaje);
 
-// baú
-        bau = new Bau(256, 256, 32, 32, personaje, rubis);
+        bau = new Bau(224, 64, 28, 28, personaje, rubis);
 
-// pedras
-        pedraQueCai = new PedraQueCai(64, 288, 32, 32, personaje, mapa);
-        pedraEmpurravel = new PedraEmpurravel(192, 224, 32, 32, mapa, personaje);
+        pedraQueCai = new PedraQueCai(1, 320, 32, 32, personaje, mapa, 320);
+        pedraEmpurravel = new PedraEmpurravel(352, 192, 32, 32, mapa, personaje, 320);
     }
 
     @Override

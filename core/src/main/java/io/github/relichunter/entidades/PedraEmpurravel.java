@@ -13,8 +13,8 @@ public class PedraEmpurravel extends Obstaculo {
     private MapaTeste mapa;
     private PersonagemTeste personagem;
     private final Rectangle caixaPedra = new Rectangle();
-    public PedraEmpurravel (float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem){
-        this.x = x;
+    private int alturaVirtual;
+    public PedraEmpurravel(float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem, int alturaVirtual) {        this.x = x;
         this.y = y;
         this.largura = largura;
         this.altura = altura;
@@ -23,7 +23,7 @@ public class PedraEmpurravel extends Obstaculo {
         this.mapa = mapa;
         this.personagem = personagem;
         this.shapeRenderer = new ShapeRenderer();
-
+        this.alturaVirtual = alturaVirtual;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class PedraEmpurravel extends Obstaculo {
         if (estaRolando) {
             x += direcao *150 * delta;
             int coluna = (int) (x / MapaTeste.TAMANHO_BLOCO);
-            int linha = (int) (y / MapaTeste.TAMANHO_BLOCO);
+            int linha = (int) ((alturaVirtual - y) / MapaTeste.TAMANHO_BLOCO);
                 if (!mapa.isEspacoLivre(coluna, linha)){
                      estaRolando = false;
             }

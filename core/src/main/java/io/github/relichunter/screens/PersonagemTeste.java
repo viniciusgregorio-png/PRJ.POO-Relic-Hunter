@@ -85,6 +85,7 @@ public class PersonagemTeste {
         } else {
             // Se parado, mantém a animação no primeiro frame da direção atual
             tempoAnimacao = 0;
+            caixaPersonagem.setPosition(posX, posY);
         }
 
         // Controle dos frames da animação
@@ -98,6 +99,7 @@ public class PersonagemTeste {
         } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             if (frameAtual.isFlipX()) frameAtual.flip(true, false);
         }
+        caixaPersonagem.setPosition(posX, posY);
     }
 
     /**

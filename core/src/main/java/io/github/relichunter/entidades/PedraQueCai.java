@@ -10,7 +10,8 @@ public class PedraQueCai extends Obstaculo{
     private PersonagemTeste personagem;
     private boolean estaCaindo;
     private MapaTeste mapa;
-    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa) {
+    private int alturaVirtual;
+    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa, int alturaVirtual) {
         this.x = x;
         this.y = y;
         this.largura = largura;
@@ -19,6 +20,7 @@ public class PedraQueCai extends Obstaculo{
         this.personagem = personagem;
         this.shapeRenderer = new ShapeRenderer();
         this.mapa = mapa;
+        this.alturaVirtual = alturaVirtual;
     }
     @Override
     public void update(float delta){
@@ -31,7 +33,7 @@ public class PedraQueCai extends Obstaculo{
             y -= 150 * delta;
 
             int coluna = (int) (x / MapaTeste.TAMANHO_BLOCO);
-            int linhaAbaixo = (int) ((y - 1) / MapaTeste.TAMANHO_BLOCO);
+            int linhaAbaixo = (int) ((alturaVirtual - y) / MapaTeste.TAMANHO_BLOCO);
 
             if (!mapa.isEspacoLivre(coluna, linhaAbaixo)) {
                 estaCaindo = false;

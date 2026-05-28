@@ -22,8 +22,11 @@ public class Rubi extends Item {
     }
     @Override
     public void update(float delta) {
-        caixaRubi.set(x, y, largura, altura);
+        if (foiColetado) return;
+
+        caixaRubi.set(x + 6, y + 6, 16, 16);
         if (caixaRubi.overlaps(personagem.getCaixaPersonagem())){
+            System.out.println("Rubi coletado! posX=" + personagem.getPosX() + " posY=" + personagem.getPosY());
             foiColetado = true;
         }
 
