@@ -1,6 +1,7 @@
 package io.github.relichunter.inimigos;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -22,8 +23,10 @@ public class InimigosSnake {
         this.vida = vida;
         this.x = x;
         this.y = y;
-        this.texture = new Texture("renan colocar o nome do sprite aqui em png ");
-        novaDirecao();
+        this.texture = new Texture("inimigo.png");
+        // Direção inicial fixa — sem incrementar contadorDirecao
+        direcaoX = 1;
+        direcaoY = 0;
     }
 
     private void novaDirecao() {
@@ -39,6 +42,15 @@ public class InimigosSnake {
     public void update(float delta) {
         x += direcaoX * speed * delta;
         y += direcaoY * speed * delta;
+
+        // Mantém o inimigo dentro dos limites da tela
+        float largura = Gdx.graphics.getWidth();
+        float altura  = Gdx.graphics.getHeight();
+
+        if (x < 0)              { x = 0;            novaDirecao(); }
+        if (x + 32 > largura)   { x = largura - 32; novaDirecao(); }
+        if (y < 0)              { y = 0;            novaDirecao(); }
+        if (y + 32 > altura)    { y = altura - 32;  novaDirecao(); }
 
         temporizador += delta;
         if (temporizador >= tempoMudanca) {
@@ -62,7 +74,7 @@ public class InimigosSnake {
     public void dispose() { texture.dispose(); }
 
     public int getForca() { return forca; }
-    public int getVida() { return vida; }
-    public float getX() { return x; }
-    public float getY() { return y; }
+    public int getVida()  { return vida;  }
+    public float getX()   { return x;    }
+    public float getY()   { return y;    }
 }

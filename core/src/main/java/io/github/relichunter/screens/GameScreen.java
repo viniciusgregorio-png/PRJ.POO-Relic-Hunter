@@ -44,6 +44,7 @@ public class GameScreen implements Screen {
         // seu jogo vai aqui
         snake.render(batch);
         batch.end();
+
     }
 
     @Override public void resize(int width, int height) {}
