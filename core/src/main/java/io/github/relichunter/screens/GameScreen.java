@@ -7,11 +7,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.relichunter.Main;
+import io.github.relichunter.inimigos.InimigosSnake;
 
 public class GameScreen implements Screen {
 
     private final Main game;
     private SpriteBatch batch;
+    private InimigosSnake snake;
 
     public GameScreen(Main game) {
         this.game = game;
@@ -20,6 +22,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
+        snake = new InimigosSnake(10, 100, 200f, 300f);
     }
 
     @Override
@@ -35,9 +38,11 @@ public class GameScreen implements Screen {
                 Gdx.graphics.setFullscreenMode(displayMode);
             }
         }
+        snake.update(delta);
 
         batch.begin();
         // seu jogo vai aqui
+        snake.render(batch);
         batch.end();
     }
 
@@ -49,5 +54,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        snake.dispose();
     }
 }
