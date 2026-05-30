@@ -42,7 +42,10 @@ public class SplashScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1f);
 
         int largura = Gdx.graphics.getWidth();
-        int altura  = Gdx.graphics.getHeight();
+        int altura = Gdx.graphics.getHeight();
+
+        Gdx.gl.glViewport(0, 0, largura, altura);
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, largura, altura);
 
         batch.begin();
         batch.draw(logo, 0, 0, largura, altura);

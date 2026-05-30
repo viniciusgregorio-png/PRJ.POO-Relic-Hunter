@@ -1,5 +1,7 @@
 AnimationSheet_Character.png
 audioInicialTopGear.mp3
 chao.png
+gameOver.png
+inimigo.png
 logoRelic.png
 parede.png

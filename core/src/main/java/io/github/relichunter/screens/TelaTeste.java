@@ -74,7 +74,9 @@ public class TelaTeste implements Screen {
         snake.update(delta);
 
         if (snake.encostouNoPlayer(personaje.getPosX(), personaje.getPosY())) {
-            System.out.println("Inimigo tocou no jogador!");
+            this.dispose();
+            game.setScreen(new GameOverScreen(game));
+            return;
         }
 
         batch.begin();
