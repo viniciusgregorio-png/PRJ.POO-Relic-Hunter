@@ -1,9 +1,10 @@
 package io.github.relichunter.inimigos;
 
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Rectangle;
+import io.github.relichunter.screens.MapaTeste;
 
 public class InimigosSnake {
     private int forca;
@@ -18,13 +19,28 @@ public class InimigosSnake {
     private float temporizador = 0f;
     private int contadorDirecao = 0;
 
-    public InimigosSnake(int forca, int vida, float x, float y) {
-        this.forca = forca;
-        this.vida = vida;
-        this.x = x;
-        this.y = y;
-        this.texture = new Texture("inimigo.png");
-        // Direção inicial fixa — sem incrementar contadorDirecao
+    private float limiteW;
+    private float limiteH;
+    private MapaTeste mapa;
+
+    private final Rectangle caixaInimigo = new Rectangle();
+    private final Rectangle caixaBloco   = new Rectangle();
+
+    public InimigosSnake(int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa) {
+        this.forca   = forca;
+        this.vida    = vida;
+        this.x       = x;
+        this.y       = y;
+        this.limiteW = limiteW;
+        this.limiteH = limiteH;
+        this.mapa    = mapa;
+
+        Pixmap pixmap = new Pixmap(32, 32, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0f, 0f, 1f, 1f);
+        pixmap.fill();
+        this.texture = new Texture(pixmap);
+        pixmap.dispose();
+
         direcaoX = 1;
         direcaoY = 0;
     }
@@ -39,18 +55,45 @@ public class InimigosSnake {
         if (contadorDirecao == 3) { direcaoX =  0; direcaoY = -1; }
     }
 
+    private boolean colideComMapa(float px, float py) {
+        caixaInimigo.set(px, py, 32, 32);
+        caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
+
+        for (int linha = 0; linha < mapa.getQuantidadeLinhas(); linha++) {
+            for (int coluna = 0; coluna < 15; coluna++) {
+                if (!mapa.isEspacoLivre(coluna, linha)) {
+                    int bx = coluna * MapaTeste.TAMANHO_BLOCO;
+                    int by = (int)(limiteH) - ((linha + 1) * MapaTeste.TAMANHO_BLOCO);
+                    caixaBloco.setPosition(bx, by);
+                    if (caixaInimigo.overlaps(caixaBloco)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void update(float delta) {
-        x += direcaoX * speed * delta;
-        y += direcaoY * speed * delta;
+        float novoX = x + direcaoX * speed * delta;
+        float novoY = y + direcaoY * speed * delta;
 
-        // Mantém o inimigo dentro dos limites da tela
-        float largura = Gdx.graphics.getWidth();
-        float altura  = Gdx.graphics.getHeight();
+        // Colisão com paredes do mapa
+        if (colideComMapa(novoX, y)) {
+            novoX = x;
+            novaDirecao();
+        }
+        if (colideComMapa(novoX, novoY)) {
+            novoY = y;
+            novaDirecao();
+        }
 
-        if (x < 0)              { x = 0;            novaDirecao(); }
-        if (x + 32 > largura)   { x = largura - 32; novaDirecao(); }
-        if (y < 0)              { y = 0;            novaDirecao(); }
-        if (y + 32 > altura)    { y = altura - 32;  novaDirecao(); }
+        x = novoX;
+        y = novoY;
+
+        // Limites da tela virtual
+        if (x < 0)            { x = 0;            novaDirecao(); }
+        if (x + 32 > limiteW) { x = limiteW - 32; novaDirecao(); }
+        if (y < 0)            { y = 0;            novaDirecao(); }
+        if (y + 32 > limiteH) { y = limiteH - 32; novaDirecao(); }
 
         temporizador += delta;
         if (temporizador >= tempoMudanca) {

@@ -1,6 +1,5 @@
 package io.github.relichunter.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,6 +11,7 @@ import io.github.relichunter.entidades.Bau;
 import io.github.relichunter.entidades.PedraEmpurravel;
 import io.github.relichunter.entidades.PedraQueCai;
 import io.github.relichunter.entidades.Rubi;
+import io.github.relichunter.inimigos.InimigosSnake;
 
 public class TelaTeste implements Screen {
 
@@ -19,6 +19,7 @@ public class TelaTeste implements Screen {
     private PedraEmpurravel pedraEmpurravel;
     private Rubi[] rubis;
     private Bau bau;
+    private InimigosSnake snake;
 
     private final Main game;
     private SpriteBatch batch;
@@ -45,7 +46,7 @@ public class TelaTeste implements Screen {
         viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
 
         camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0);
-        // 3 rubis em posições diferentes do mapa
+
         rubis = new Rubi[3];
         rubis[0] = new Rubi(160, 64, 28, 28, personaje);
         rubis[1] = new Rubi(224, 64, 28, 28, personaje);
@@ -55,7 +56,8 @@ public class TelaTeste implements Screen {
 
         pedraQueCai = new PedraQueCai(1, 320, 32, 32, personaje, mapa, 320);
         pedraEmpurravel = new PedraEmpurravel(352, 192, 32, 32, mapa, personaje, 320);
-    }
+
+        snake = new InimigosSnake(10, 100, 7 * MapaTeste.TAMANHO_BLOCO, 320 - (6 * MapaTeste.TAMANHO_BLOCO), LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);    }
 
     @Override
     public void render(float delta) {
@@ -69,18 +71,22 @@ public class TelaTeste implements Screen {
         pedraEmpurravel.update(delta);
         for (Rubi rubi : rubis) { rubi.update(delta); }
         bau.update(delta);
+        snake.update(delta);
+
+        if (snake.encostouNoPlayer(personaje.getPosX(), personaje.getPosY())) {
+            System.out.println("Inimigo tocou no jogador!");
+        }
 
         batch.begin();
         mapa.desenhar(batch, ALTURA_VIRTUAL);
         personaje.desenhar(batch, ALTURA_VIRTUAL);
+        snake.render(batch);
         batch.end();
 
         pedraQueCai.render();
         pedraEmpurravel.render();
         for (Rubi rubi : rubis) { rubi.render(); }
         bau.render();
-
-
     }
 
     @Override
@@ -101,5 +107,6 @@ public class TelaTeste implements Screen {
         pedraEmpurravel.dispose();
         for (Rubi rubi : rubis) { rubi.dispose(); }
         bau.dispose();
+        snake.dispose();
     }
 }

@@ -22,14 +22,13 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        snake = new InimigosSnake(10, 100, 200f, 300f);
+        snake = new InimigosSnake(10, 100, 200f, 300f, 480, 320, null);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1f);
 
-        // F11 → alterna tela cheia / janela
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             if (Gdx.graphics.isFullscreen()) {
                 Gdx.graphics.setWindowedMode(1250, 768);
@@ -41,10 +40,8 @@ public class GameScreen implements Screen {
         snake.update(delta);
 
         batch.begin();
-        // seu jogo vai aqui
         snake.render(batch);
         batch.end();
-
     }
 
     @Override public void resize(int width, int height) {}
