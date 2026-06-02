@@ -52,12 +52,16 @@ public class TelaTeste implements Screen {
         rubis[1] = new Rubi(224, 64, 28, 28, personaje);
         rubis[2] = new Rubi(288, 64, 28, 28, personaje);
 
-        bau = new Bau(224, 64, 28, 28, personaje, rubis);
+        bau = new Bau(352, 64, 28, 28, personaje, rubis);
 
         pedraQueCai = new PedraQueCai(1, 320, 32, 32, personaje, mapa, 320);
-        pedraEmpurravel = new PedraEmpurravel(352, 192, 32, 32, mapa, personaje, 320);
 
-        snake = new InimigosSnake(10, 100, 7 * MapaTeste.TAMANHO_BLOCO, 320 - (6 * MapaTeste.TAMANHO_BLOCO), LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);    }
+        // ✅ Posição corrigida: linha 3, coluna 5 (x=160, y=224)
+        // Matriz linha 3: {1,0,1,0,0,0,0,0,0,0,1,0,1,0,1} → espaço livre nos dois lados
+        pedraEmpurravel = new PedraEmpurravel(160, 224, 32, 32, mapa, personaje, 320);
+
+        snake = new InimigosSnake(10, 100, 7 * MapaTeste.TAMANHO_BLOCO, 320 - (6 * MapaTeste.TAMANHO_BLOCO), LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+    }
 
     @Override
     public void render(float delta) {
@@ -85,10 +89,10 @@ public class TelaTeste implements Screen {
         snake.render(batch);
         batch.end();
 
-        pedraQueCai.render();
-        pedraEmpurravel.render();
-        for (Rubi rubi : rubis) { rubi.render(); }
-        bau.render();
+        pedraQueCai.render(camera);
+        pedraEmpurravel.render(camera);
+        for (Rubi rubi : rubis) { rubi.render(camera); }
+        bau.render(camera);
     }
 
     @Override

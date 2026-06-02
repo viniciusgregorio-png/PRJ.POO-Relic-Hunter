@@ -1,16 +1,18 @@
 package io.github.relichunter.entidades;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class PedraQueCai extends Obstaculo{
+public class PedraQueCai extends Obstaculo {
     private ShapeRenderer shapeRenderer;
     private PersonagemTeste personagem;
     private boolean estaCaindo;
     private MapaTeste mapa;
     private int alturaVirtual;
+
     public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa, int alturaVirtual) {
         this.x = x;
         this.y = y;
@@ -22,8 +24,9 @@ public class PedraQueCai extends Obstaculo{
         this.mapa = mapa;
         this.alturaVirtual = alturaVirtual;
     }
+
     @Override
-    public void update(float delta){
+    public void update(float delta) {
         int colunaPedra = (int) (x / MapaTeste.TAMANHO_BLOCO);
         int colunaPersonagem = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
         if (colunaPedra == colunaPersonagem) {
@@ -41,18 +44,16 @@ public class PedraQueCai extends Obstaculo{
         }
     }
 
-
     @Override
-    public void render() {
+    public void render(OrthographicCamera camera) {
+        shapeRenderer.setProjectionMatrix(camera.combined); // ✅ usa a câmera
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(x, y, largura, altura);
         shapeRenderer.end();
-
     }
-    public void dispose(){
+
+    public void dispose() {
         shapeRenderer.dispose();
     }
-
 }
-

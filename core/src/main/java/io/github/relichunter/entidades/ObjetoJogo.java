@@ -1,5 +1,7 @@
 package io.github.relichunter.entidades;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
+
 public abstract class ObjetoJogo {
     protected float y;
     protected float x;
@@ -7,6 +9,5 @@ public abstract class ObjetoJogo {
     protected float altura;
 
     public abstract void update(float delta);
-    public abstract void render();
-
+    public abstract void render(OrthographicCamera camera);
 }

@@ -1,6 +1,7 @@
 package io.github.relichunter.entidades;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.PersonagemTeste;
@@ -20,6 +21,7 @@ public class Rubi extends Item {
         this.personagem = personagem;
         this.shapeRenderer = new ShapeRenderer();
     }
+
     @Override
     public void update(float delta) {
         if (foiColetado) return;
@@ -29,22 +31,23 @@ public class Rubi extends Item {
             System.out.println("Rubi coletado! posX=" + personagem.getPosX() + " posY=" + personagem.getPosY());
             foiColetado = true;
         }
-
     }
 
     @Override
-    public void render() {
+    public void render(OrthographicCamera camera) {
         if (!foiColetado) {
+            shapeRenderer.setProjectionMatrix(camera.combined); // ✅ usa a câmera
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(Color.PURPLE);
             shapeRenderer.rect(x, y, largura, altura);
             shapeRenderer.end();
         }
-
     }
+
     public boolean isFoiColetado(){
         return foiColetado;
     }
+
     public void dispose(){
         shapeRenderer.dispose();
     }

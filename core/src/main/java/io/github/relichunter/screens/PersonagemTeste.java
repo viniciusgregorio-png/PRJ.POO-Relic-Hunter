@@ -37,6 +37,7 @@ public class PersonagemTeste {
 
         // Caixa de colisão ligeiramente menor para não engasgar nos cantos
         caixaPersonagem.setSize(28, 28);
+        caixaPersonagem.setPosition(posX + 2, posY + 2);
     }
 
     public void atualizar(MapaTeste mapa, float delta) {
@@ -47,22 +48,20 @@ public class PersonagemTeste {
         // Captura as intenções de movimento e define as linhas de animação
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
             linhaAnimacaoAtual = 1; // Olhando para trás
-            movimentoY = VELOCIDADE * delta; // Sobe no eixo Y do LibGDX
+            movimentoY = VELOCIDADE * delta;
             estaSeMovendo = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             linhaAnimacaoAtual = 0; // Olhando para frente
-            movimentoY = -VELOCIDADE * delta; // Desce no eixo Y
+            movimentoY = -VELOCIDADE * delta;
             estaSeMovendo = true;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            linhaAnimacaoAtual = 3; // Correndo de lado
+            linhaAnimacaoAtual = 3;
             movimentoX = -VELOCIDADE * delta;
             estaSeMovendo = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            linhaAnimacaoAtual = 3; // Correndo de lado
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            linhaAnimacaoAtual = 3;
             movimentoX = VELOCIDADE * delta;
             estaSeMovendo = true;
         }
@@ -82,10 +81,6 @@ public class PersonagemTeste {
             if (!detectarColisao(posX, novaPosY, mapa)) {
                 posY = novaPosY;
             }
-        } else {
-            // Se parado, mantém a animação no primeiro frame da direção atual
-            tempoAnimacao = 0;
-            caixaPersonagem.setPosition(posX, posY);
         }
 
         // Controle dos frames da animação
@@ -99,7 +94,9 @@ public class PersonagemTeste {
         } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             if (frameAtual.isFlipX()) frameAtual.flip(true, false);
         }
-        caixaPersonagem.setPosition(posX, posY);
+
+        // Atualiza a caixa SEMPRE no final, com a posição definitiva do personagem
+        caixaPersonagem.setPosition(posX + 2, posY + 2);
     }
 
     /**
@@ -107,12 +104,11 @@ public class PersonagemTeste {
      * procurando se colidimos com algum bloco de parede (1).
      */
     private boolean detectarColisao(float proximaX, float proximaY, MapaTeste mapa) {
-        caixaPersonagem.setPosition(proximaX, proximaY);
+        caixaPersonagem.setPosition(proximaX + 2, proximaY + 2);
         caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
 
         for (int linha = 0; linha < mapa.getQuantidadeLinhas(); linha++) {
             for (int coluna = 0; coluna < 15; coluna++) {
-
                 if (!mapa.isEspacoLivre(coluna, linha)) {
                     int xPixelBloco = coluna * MapaTeste.TAMANHO_BLOCO;
                     int yPixelBloco = 320 - ((linha + 1) * MapaTeste.TAMANHO_BLOCO);
@@ -120,27 +116,52 @@ public class PersonagemTeste {
                     caixaBloco.setPosition(xPixelBloco, yPixelBloco);
 
                     if (caixaPersonagem.overlaps(caixaBloco)) {
+                        // Restaura a caixa para a posição real antes de retornar
+                        caixaPersonagem.setPosition(posX + 2, posY + 2);
                         return true;
                     }
                 }
             }
         }
+
+        // Restaura a caixa para a posição real antes de retornar
+        caixaPersonagem.setPosition(posX + 2, posY + 2);
         return false;
     }
 
     public void desenhar(SpriteBatch batch, int alturaJanela) {
-        // Agora desenha diretamente nas coordenadas float X e Y livres
         batch.draw(frameAtual, posX, posY, MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
     }
+
     public Rectangle getCaixaPersonagem() {
         return caixaPersonagem;
     }
+
     public float getPosX() {
         return posX;
     }
-    public float getPosY(){
+
+    public float getPosY() {
         return posY;
     }
+
+    // ✅ Atualiza posX e reposiciona a caixa de colisão
+    public void setPosX(float v) {
+        posX = v;
+        caixaPersonagem.setPosition(posX + 2, posY + 2);
+    }
+
+    // ✅ Atualiza posY e reposiciona a caixa de colisão
+    public void setPosY(float v) {
+        posY = v;
+        caixaPersonagem.setPosition(posX + 2, posY + 2);
+    }
+
+    // ✅ Necessário para calcular o centro do personagem na pedra
+    public float getLargura() {
+        return 28f; // mesmo tamanho da caixaPersonagem
+    }
+
     public void dispose() {
         spriteSheet.dispose();
     }
