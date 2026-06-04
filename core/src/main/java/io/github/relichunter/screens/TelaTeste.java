@@ -22,7 +22,8 @@ public class TelaTeste implements Screen {
 
     private PedraQueCai pedraQueCai;
     private PedraEmpurravel pedraEmpurravel;
-    private Rubi[] rubis;
+    private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
+    private boolean jaLiberouNovosRubis = false;
     private Bau bau;
     private InimigosSnake snake;
 
@@ -46,14 +47,15 @@ public class TelaTeste implements Screen {
         viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
         camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0f);
 
-        rubis = new Rubi[3];
-        rubis[0] = new Rubi(160.0F, 64.0F, 28.0F, 28.0F, personaje);
-        rubis[1] = new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje);
-        rubis[2] = new Rubi(288.0F, 64.0F, 28.0F, 28.0F, personaje);
+        listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
+        listaRubis.add(new Rubi(160.0F, 64.0F, 28.0F, 28.0F, personaje));
+        listaRubis.add(new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje));
+        listaRubis.add(new Rubi(288.0F, 64.0F, 28.0F, 28.0F, personaje));
 
-        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F, personaje, rubis);
+        Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
+        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F,  personaje, arrayParaOBau);
         pedraQueCai = new PedraQueCai(1.0F, 320.0F, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL);
-        pedraEmpurravel = new PedraEmpurravel(160.0F, 224.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
+        pedraEmpurravel = new PedraEmpurravel(129.0F, 129.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
         snake = new InimigosSnake(10, 100, 224.0F, 128.0F, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
     }
 
@@ -68,12 +70,21 @@ public class TelaTeste implements Screen {
         pedraQueCai.update(delta);
         pedraEmpurravel.update(delta);
 
-        for (Rubi rubi : rubis) {
+        for (Rubi rubi : listaRubis) {
             rubi.update(delta);
         }
 
         bau.update(delta);
         snake.update(delta);
+        if (bau.isFoiAberto() && !jaLiberouNovosRubis){
+            listaRubis.add(new Rubi(96.0F, 128.0F, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(160.0F, 128.0F, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(352.0F, 128.0F, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(288.0F, 128.0F, 28.0F, 28.0F, personaje));
+
+            jaLiberouNovosRubis = true;
+        }
 
         if (snake.encostouNoPlayer(personaje)) {
             game.setScreen(new GameOverScreen(game));
@@ -89,7 +100,7 @@ public class TelaTeste implements Screen {
         pedraQueCai.render(camera);
         pedraEmpurravel.render(camera);
 
-        for (Rubi rubi : rubis) {
+        for (Rubi rubi : listaRubis) {
             rubi.render(camera);
         }
         bau.render(camera);
@@ -112,7 +123,7 @@ public class TelaTeste implements Screen {
         pedraQueCai.dispose();
         pedraEmpurravel.dispose();
 
-        for (Rubi rubi : rubis) {
+        for (Rubi rubi : listaRubis) {
             rubi.dispose();
         }
         bau.dispose();

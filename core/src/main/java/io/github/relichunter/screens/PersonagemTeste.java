@@ -165,4 +165,8 @@ public class PersonagemTeste {
     public void dispose() {
         spriteSheet.dispose();
     }
+
+    public float getAltura() {
+        return 32f; // <-- Substitua o 32f pela altura real da sua caixaPersonagem
+    }
 }

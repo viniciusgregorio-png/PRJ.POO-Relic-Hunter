@@ -11,10 +11,9 @@ public class PedraEmpurravel extends Obstaculo {
     private ShapeRenderer shapeRenderer;
     private boolean estaRolando;
     private float direcao;
-    private MapaTeste mapa;
     private PersonagemTeste personagem;
     private final Rectangle caixaPedra = new Rectangle();
-    private int alturaVirtual;
+    private final GerenciadorColisao colisao;
 
     public PedraEmpurravel(float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem, int alturaVirtual) {
         this.x = x;
@@ -23,81 +22,95 @@ public class PedraEmpurravel extends Obstaculo {
         this.altura = altura;
         this.estaRolando = false;
         this.direcao = 0;
-        this.mapa = mapa;
         this.personagem = personagem;
         this.shapeRenderer = new ShapeRenderer();
-        this.alturaVirtual = alturaVirtual;
+        this.colisao = new GerenciadorColisao(mapa, alturaVirtual);
     }
 
     @Override
     public void update(float delta) {
         caixaPedra.set(x, y, largura, altura);
 
-        if (caixaPedra.overlaps(personagem.getCaixaPersonagem())) {
-            // Centro do personagem e da pedra
-            float centroPersonX = personagem.getPosX() + personagem.getLargura() / 2f;
-            float centroPersonY = personagem.getPosY() + 14f; // metade da caixa (28/2)
-            float centroPedraX  = x + largura / 2f;
-            float centroPedraY  = y + altura / 2f;
+        // Obtenção direta da caixa de colisão do jogador para precisão absoluta
+        Rectangle caixaPlayer = personagem.getCaixaPersonagem();
 
-            // Diferença entre centros
-            float dx = centroPersonX - centroPedraX;
-            float dy = centroPersonY - centroPedraY;
+        if (caixaPedra.overlaps(caixaPlayer)) {
+            // 1. Identificação do lado de colisão inicial pelo gerenciador
+            String lado = colisao.ladoColisao(caixaPlayer, caixaPedra);
 
-            // Soma das metades (distância necessária para não haver sobreposição)
-            float combinadoX = personagem.getLargura() / 2f + largura / 2f;
-            float combinadoY = 14f + altura / 2f;
+            // 🛡️ FILTRO DE SEGURANÇA (Resolução de conflito de colisão diagonal)
+            float centroPlayerX = caixaPlayer.x + caixaPlayer.width / 2f;
+            float centroStoneX = caixaPedra.x + caixaPedra.width / 2f;
+            float centroPlayerY = caixaPlayer.y + caixaPlayer.height / 2f;
+            float centroStoneY = caixaPedra.y + caixaPedra.height / 2f;
 
-            // Sobreposição real em cada eixo
-            float overlapX = combinadoX - Math.abs(dx);
-            float overlapY = combinadoY - Math.abs(dy);
+            float diffX = Math.abs(centroPlayerX - centroStoneX);
+            float diffY = Math.abs(centroPlayerY - centroStoneY);
 
-            if (overlapX < overlapY) {
-                // Colisão lateral → empurra no X e rola a pedra
-                if (dx < 0) {
-                    System.out.println("ESQUERDA");
-                    // Personagem à esquerda → pedra vai pra direita
-                    direcao = 1;
-                    personagem.setPosX(x - personagem.getLargura());
+            if (diffX > diffY) {
+                if (centroPlayerX < centroStoneX) {
+                    lado = "ESQUERDA";
                 } else {
-                    System.out.println("DIREITA");
-                    // Personagem à direita → pedra vai pra esquerda
-                    direcao = -1;
-                    personagem.setPosX(x + largura);
+                    lado = "DIREITA";
                 }
-                estaRolando = true;
             } else {
-                // Colisão vertical → bloqueia sem rolar
-                estaRolando = false;
-                if (dy > 0) {
-                    System.out.println("ACIMA");
-                    // Personagem acima da pedra
-                    personagem.setPosY(y + altura);
+                if (centroPlayerY < centroStoneY) {
+                    lado = "ABAIXO";
                 } else {
-                    System.out.println("ABAIXO");
-                    // Personagem abaixo da pedra
-
-                    y += altura;
-                    personagem.setPosY(y - altura);
+                    lado = "ACIMA";
                 }
-                estaRolando = true;
+            }
+
+            // 2. Aplicação do comportamento seguro com base no lado corrigido
+            // Subtraímos/somamos uma folga de segurança (ex: 2.1f) para compensar o alinhamento
+            // do sprite (normalmente maior) com a hitbox interna, prevenindo que fiquem colados.
+            switch (lado) {
+                case "ESQUERDA":
+                    direcao = 1; // Movimento para a direita
+                    estaRolando = true;
+                    break;
+                case "DIREITA":
+                    direcao = -1; // Movimento para a esquerda
+                    estaRolando = true;
+                    break;
+                case "ACIMA":
+                    // Bloqueio superior limpo
+                    personagem.setPosY(y + altura + 0.1f);
+                    estaRolando = false;
+                    break;
+                case "ABAIXO":
+                    // Bloqueio inferior compensando possíveis offsets do eixo Y
+                    personagem.setPosY(y - caixaPlayer.height - 2.1f);
+                    estaRolando = false;
+                    break;
+            }
+
+            // 3. Execução do movimento físico da pedra
+            if (estaRolando) {
+                float novaX = x + direcao * 150 * delta;
+
+                if (colisao.podeMoverX(caixaPedra, novaX)) {
+                    x = novaX;
+
+                    // O jogador acompanha a pedra mantendo a distância exata da sua hitbox
+                    if (lado.equals("ESQUERDA")) {
+                        personagem.setPosX(x - caixaPlayer.width - 2.1f);
+                    } else if (lado.equals("DIREITA")) {
+                        personagem.setPosX(x + largura - 1.9f);
+                    }
+                } else {
+                    estaRolando = false;
+
+                    // Se a pedra colidir com a parede, o jogador é bloqueado sem atravessar
+                    if (lado.equals("ESQUERDA")) {
+                        personagem.setPosX(x - caixaPlayer.width - 2.1f);
+                    } else if (lado.equals("DIREITA")) {
+                        personagem.setPosX(x + largura - 1.9f);
+                    }
+                }
             }
         } else {
-            estaRolando = false; // para quando o personagem sai do alcance
-        }
-
-        if (estaRolando) {
-            float novaX = x + direcao * 150 * delta;
-
-            // Checa a borda da frente da pedra antes de mover
-            int colunaFrente = (int) ((novaX + (direcao > 0 ? largura : 0)) / MapaTeste.TAMANHO_BLOCO);
-            int linha = (int) ((alturaVirtual - y) / MapaTeste.TAMANHO_BLOCO);
-
-            if (mapa.isEspacoLivre(colunaFrente, linha)) {
-                x = novaX; // só move se o espaço for livre
-            } else {
-                estaRolando = false; // para sem atravessar a parede
-            }
+            estaRolando = false;
         }
     }
 
