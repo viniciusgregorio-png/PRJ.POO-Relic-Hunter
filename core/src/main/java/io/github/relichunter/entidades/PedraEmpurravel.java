@@ -55,10 +55,12 @@ public class PedraEmpurravel extends Obstaculo {
             if (overlapX < overlapY) {
                 // Colisão lateral → empurra no X e rola a pedra
                 if (dx < 0) {
+                    System.out.println("ESQUERDA");
                     // Personagem à esquerda → pedra vai pra direita
                     direcao = 1;
                     personagem.setPosX(x - personagem.getLargura());
                 } else {
+                    System.out.println("DIREITA");
                     // Personagem à direita → pedra vai pra esquerda
                     direcao = -1;
                     personagem.setPosX(x + largura);
@@ -68,12 +70,17 @@ public class PedraEmpurravel extends Obstaculo {
                 // Colisão vertical → bloqueia sem rolar
                 estaRolando = false;
                 if (dy > 0) {
+                    System.out.println("ACIMA");
                     // Personagem acima da pedra
                     personagem.setPosY(y + altura);
                 } else {
+                    System.out.println("ABAIXO");
                     // Personagem abaixo da pedra
-                    personagem.setPosY(y - 28f);
+
+                    y += altura;
+                    personagem.setPosY(y - altura);
                 }
+                estaRolando = true;
             }
         } else {
             estaRolando = false; // para quando o personagem sai do alcance
