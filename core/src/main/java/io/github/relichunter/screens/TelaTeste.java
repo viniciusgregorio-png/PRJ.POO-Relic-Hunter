@@ -15,16 +15,16 @@ import io.github.relichunter.inimigos.InimigosSnake;
 
 public class TelaTeste implements Screen {
 
+    private final Main game;
+    private SpriteBatch batch;
+    private MapaTeste mapa;
+    private PersonagemTeste personaje;
+
     private PedraQueCai pedraQueCai;
     private PedraEmpurravel pedraEmpurravel;
     private Rubi[] rubis;
     private Bau bau;
     private InimigosSnake snake;
-
-    private final Main game;
-    private SpriteBatch batch;
-    private MapaTeste mapa;
-    private PersonagemTeste personaje;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -44,28 +44,22 @@ public class TelaTeste implements Screen {
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
-
-        camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0);
+        camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0f);
 
         rubis = new Rubi[3];
-        rubis[0] = new Rubi(160, 64, 28, 28, personaje);
-        rubis[1] = new Rubi(224, 64, 28, 28, personaje);
-        rubis[2] = new Rubi(288, 64, 28, 28, personaje);
+        rubis[0] = new Rubi(160.0F, 64.0F, 28.0F, 28.0F, personaje);
+        rubis[1] = new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje);
+        rubis[2] = new Rubi(288.0F, 64.0F, 28.0F, 28.0F, personaje);
 
-        bau = new Bau(352, 64, 28, 28, personaje, rubis);
-
-        pedraQueCai = new PedraQueCai(1, 320, 32, 32, personaje, mapa, 320);
-
-        // ✅ Posição corrigida: linha 3, coluna 5 (x=160, y=224)
-        // Matriz linha 3: {1,0,1,0,0,0,0,0,0,0,1,0,1,0,1} → espaço livre nos dois lados
-        pedraEmpurravel = new PedraEmpurravel(160, 224, 32, 32, mapa, personaje, 320);
-
-        snake = new InimigosSnake(10, 100, 7 * MapaTeste.TAMANHO_BLOCO, 320 - (6 * MapaTeste.TAMANHO_BLOCO), LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F, personaje, rubis);
+        pedraQueCai = new PedraQueCai(1.0F, 320.0F, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL);
+        pedraEmpurravel = new PedraEmpurravel(160.0F, 224.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
+        snake = new InimigosSnake(10, 100, 224.0F, 128.0F, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
     }
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0.15f, 0.15f, 0.15f, 1f);
+        ScreenUtils.clear(0.15F, 0.15F, 0.15F, 1.0F);
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -73,12 +67,15 @@ public class TelaTeste implements Screen {
         personaje.atualizar(mapa, delta);
         pedraQueCai.update(delta);
         pedraEmpurravel.update(delta);
-        for (Rubi rubi : rubis) { rubi.update(delta); }
+
+        for (Rubi rubi : rubis) {
+            rubi.update(delta);
+        }
+
         bau.update(delta);
         snake.update(delta);
 
-        if (snake.encostouNoPlayer(personaje.getPosX(), personaje.getPosY())) {
-            this.dispose();
+        if (snake.encostouNoPlayer(personaje)) {
             game.setScreen(new GameOverScreen(game));
             return;
         }
@@ -91,7 +88,10 @@ public class TelaTeste implements Screen {
 
         pedraQueCai.render(camera);
         pedraEmpurravel.render(camera);
-        for (Rubi rubi : rubis) { rubi.render(camera); }
+
+        for (Rubi rubi : rubis) {
+            rubi.render(camera);
+        }
         bau.render(camera);
     }
 
@@ -111,7 +111,10 @@ public class TelaTeste implements Screen {
         personaje.dispose();
         pedraQueCai.dispose();
         pedraEmpurravel.dispose();
-        for (Rubi rubi : rubis) { rubi.dispose(); }
+
+        for (Rubi rubi : rubis) {
+            rubi.dispose();
+        }
         bau.dispose();
         snake.dispose();
     }

@@ -2,13 +2,17 @@ package io.github.relichunter.entidades;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.PersonagemTeste;
 
 public class Rubi extends Item {
     private boolean foiColetado;
-    private ShapeRenderer shapeRenderer;
+    private SpriteBatch spriteBatch;
+    private Texture spriteSheet;
+    private TextureRegion cristalRoxo;
     private Rectangle caixaRubi = new Rectangle();
     private PersonagemTeste personagem;
 
@@ -19,7 +23,9 @@ public class Rubi extends Item {
         this.altura = altura;
         this.foiColetado = false;
         this.personagem = personagem;
-        this.shapeRenderer = new ShapeRenderer();
+        this.spriteBatch = new SpriteBatch();
+        this.spriteSheet = new Texture("Crystals.png");
+        this.cristalRoxo = new TextureRegion(spriteSheet, 32, 0, 32, 32);
     }
 
     @Override
@@ -36,11 +42,11 @@ public class Rubi extends Item {
     @Override
     public void render(OrthographicCamera camera) {
         if (!foiColetado) {
-            shapeRenderer.setProjectionMatrix(camera.combined); // ✅ usa a câmera
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.PURPLE);
-            shapeRenderer.rect(x, y, largura, altura);
-            shapeRenderer.end();
+            spriteBatch.setProjectionMatrix(camera.combined);
+
+            spriteBatch.begin();
+            spriteBatch.draw(cristalRoxo, x, y, largura, altura);
+            spriteBatch.end();
         }
     }
 
@@ -49,6 +55,7 @@ public class Rubi extends Item {
     }
 
     public void dispose(){
-        shapeRenderer.dispose();
+        spriteBatch.dispose();
+        spriteSheet.dispose();
     }
 }

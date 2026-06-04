@@ -3,23 +3,10 @@ package io.github.relichunter.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.github.relichunter.Main;
-import javax.swing.JOptionPane;
 
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return;
-
-        Object[] options = {"Sim", "Não"};
-        int choice = JOptionPane.showOptionDialog(null,
-            "Deseja iniciar o Relic Hunter?",
-            "Inicialização do jogo",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null, options, options[0]);
-
-        if (choice != 0) {
-            System.exit(0);
-        }
 
         createApplication();
     }

@@ -1,8 +1,11 @@
 AnimationSheet_Character.png
+Crystals.png
 audioInicialTopGear.mp3
 chao.png
+chests_byBatuhanK.png
 endGame.png
 gameOver.png
 inimigo.png
 logoRelic.png
 parede.png
+snake_spritesheet.png

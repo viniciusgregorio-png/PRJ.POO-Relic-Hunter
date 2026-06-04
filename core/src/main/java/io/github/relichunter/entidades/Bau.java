@@ -1,17 +1,23 @@
 package io.github.relichunter.entidades;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.PersonagemTeste;
 
-
-public class Bau extends Item{
+public class Bau extends Item {
     private boolean estaVisivel = false;
     private boolean foiAberto;
     private PersonagemTeste personagem;
-    private ShapeRenderer shapeRenderer;
+
+    private SpriteBatch spriteBatch;
+    private Texture spriteSheet;
+    private TextureRegion bauFechado;
+    private TextureRegion bauAberto;
+    private TextureRegion frameAtual;
+
     private Rectangle caixaBau;
     private Rubi[] rubis;
 
@@ -24,44 +30,63 @@ public class Bau extends Item{
         this.rubis = rubis;
         this.estaVisivel = false;
         this.foiAberto = false;
-        this.shapeRenderer = new ShapeRenderer();
         this.caixaBau = new Rectangle();
+
+        this.spriteBatch = new SpriteBatch();
+        this.spriteSheet = new Texture("chests_byBatuhanK.png");
+
+        this.bauFechado = new TextureRegion(spriteSheet, 64, 0, 32, 32);
+        this.bauAberto  = new TextureRegion(spriteSheet, 64, 32, 32, 32);
+
+        this.frameAtual = bauFechado;
     }
 
     @Override
     public void update(float delta) {
+        if (foiAberto) return;
+
         int rubisColetados = 0;
         for (Rubi rubi : rubis) {
             if (rubi.isFoiColetado()){
                 rubisColetados++;
             }
         }
+
         if (rubisColetados == 3){
             estaVisivel = true;
         }
+
         if (estaVisivel){
             caixaBau.set(x, y, largura, altura);
-            System.out.println("Bau em x=" + x + " y=" + y +
-                " | Personagem em x=" + personagem.getPosX() +
-                " y=" + personagem.getPosY());
+
             if (caixaBau.overlaps(personagem.getCaixaPersonagem())){
                 foiAberto = true;
+                frameAtual = bauAberto;
             }
         }
     }
 
     @Override
     public void render(OrthographicCamera camera) {
-        if (estaVisivel && !foiAberto){
-            shapeRenderer.setProjectionMatrix(camera.combined); // ✅ usa a câmera
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.YELLOW);
-            shapeRenderer.rect(x, y, largura, altura);
-            shapeRenderer.end();
+        if (estaVisivel) {
+            spriteBatch.setProjectionMatrix(camera.combined);
+
+            spriteBatch.begin();
+            spriteBatch.draw(frameAtual, x, y, largura, altura);
+            spriteBatch.end();
         }
     }
 
     public void dispose(){
-        shapeRenderer.dispose();
+        spriteBatch.dispose();
+        spriteSheet.dispose();
+    }
+
+    public boolean isFoiAberto() {
+        return foiAberto;
+    }
+
+    public boolean isEstaVisivel() {
+        return estaVisivel;
     }
 }

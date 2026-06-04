@@ -2,28 +2,33 @@ package io.github.relichunter.inimigos;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.MapaTeste;
+import io.github.relichunter.screens.PersonagemTeste;
 
 public class InimigosSnake {
     private int forca;
     private int vida;
     private float x, y;
     private float speed = 60f;
-    private Texture texture;
+
+    private Texture spriteSheet;
+    private TextureRegion[] frames;
+    private TextureRegion frameAtual;
+
+    private float tempoAnimacao = 0f;
+    private final float VELOCIDADE_ANIMACAO = 0.15f;
 
     private float direcaoX;
     private float direcaoY;
-    private float tempoMudanca = 2f;
-    private float temporizador = 0f;
-    private int contadorDirecao = 0;
+    private int contadorDirecao = 0; // 0 para Cima, 1 para Baixo
 
     private float limiteW;
     private float limiteH;
     private MapaTeste mapa;
 
-    private final Rectangle caixaInimigo = new Rectangle();
+    private final Rectangle cajaInimigo = new Rectangle();
     private final Rectangle caixaBloco   = new Rectangle();
 
     public InimigosSnake(int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa) {
@@ -35,37 +40,45 @@ public class InimigosSnake {
         this.limiteH = limiteH;
         this.mapa    = mapa;
 
-        Pixmap pixmap = new Pixmap(32, 32, Pixmap.Format.RGBA8888);
-        pixmap.setColor(0f, 0f, 1f, 1f);
-        pixmap.fill();
-        this.texture = new Texture(pixmap);
-        pixmap.dispose();
+        this.spriteSheet = new Texture("snake_spritesheet.png");
 
-        direcaoX = 1;
-        direcaoY = 0;
+        frames = new TextureRegion[7];
+        for (int i = 0; i < 7; i++) {
+            frames[i] = new TextureRegion(spriteSheet, i * 32, 0, 32, 32);
+        }
+
+        this.frameAtual = frames[0];
+
+        // Começa movendo para cima
+        direcaoX = 0;
+        direcaoY = 1;
+        contadorDirecao = 0;
     }
 
+    // Alterna estritamente entre Cima e Baixo
     private void novaDirecao() {
-        contadorDirecao++;
-        if (contadorDirecao > 3) contadorDirecao = 0;
-
-        if (contadorDirecao == 0) { direcaoX =  1; direcaoY =  0; }
-        if (contadorDirecao == 1) { direcaoX = -1; direcaoY =  0; }
-        if (contadorDirecao == 2) { direcaoX =  0; direcaoY =  1; }
-        if (contadorDirecao == 3) { direcaoX =  0; direcaoY = -1; }
+        if (contadorDirecao == 0) {
+            direcaoX = 0;
+            direcaoY = -1; // Muda para Baixo
+            contadorDirecao = 1;
+        } else {
+            direcaoX = 0;
+            direcaoY = 1;  // Muda para Cima
+            contadorDirecao = 0;
+        }
     }
 
     private boolean colideComMapa(float px, float py) {
-        caixaInimigo.set(px, py, 32, 32);
+        cajaInimigo.set(px + 4f, py + 4f, 24f, 24f);
         caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
 
-        for (int linha = 0; linha < mapa.getQuantidadeLinhas(); linha++) {
+        for (int javaLinha = 0; javaLinha < mapa.getQuantidadeLinhas(); javaLinha++) {
             for (int coluna = 0; coluna < 15; coluna++) {
-                if (!mapa.isEspacoLivre(coluna, linha)) {
+                if (!mapa.isEspacoLivre(coluna, javaLinha)) {
                     int bx = coluna * MapaTeste.TAMANHO_BLOCO;
-                    int by = (int)(limiteH) - ((linha + 1) * MapaTeste.TAMANHO_BLOCO);
+                    int by = (int)(limiteH) - ((javaLinha + 1) * MapaTeste.TAMANHO_BLOCO);
                     caixaBloco.setPosition(bx, by);
-                    if (caixaInimigo.overlaps(caixaBloco)) return true;
+                    if (cajaInimigo.overlaps(caixaBloco)) return true;
                 }
             }
         }
@@ -73,48 +86,39 @@ public class InimigosSnake {
     }
 
     public void update(float delta) {
-        float novoX = x + direcaoX * speed * delta;
+        // Como ela só anda no eixo Y, novoX sempre será o x atual
         float novoY = y + direcaoY * speed * delta;
 
-        // Colisão com paredes do mapa
-        if (colideComMapa(novoX, y)) {
-            novoX = x;
-            novaDirecao();
-        }
-        if (colideComMapa(novoX, novoY)) {
+        // Se colidir verticalmente com o mapa, para o movimento e inverte o sentido
+        if (colideComMapa(x, novoY)) {
             novoY = y;
             novaDirecao();
         }
 
-        x = novoX;
         y = novoY;
 
-        // Limites da tela virtual
-        if (x < 0)            { x = 0;            novaDirecao(); }
-        if (x + 32 > limiteW) { x = limiteW - 32; novaDirecao(); }
+        // Limites da janela do jogo (Garante que ela não saia da tela por segurança)
         if (y < 0)            { y = 0;            novaDirecao(); }
         if (y + 32 > limiteH) { y = limiteH - 32; novaDirecao(); }
 
-        temporizador += delta;
-        if (temporizador >= tempoMudanca) {
-            temporizador = 0f;
-            novaDirecao();
-        }
+        // Atualização dos frames de animação
+        tempoAnimacao += delta;
+        int frameId = (int)(tempoAnimacao / VELOCIDADE_ANIMACAO) % 7;
+        frameAtual = frames[frameId];
     }
 
-    public boolean encostouNoPlayer(float playerX, float playerY) {
-        float dx = playerX - x;
-        float dy = playerY - y;
-        if (dx < 0) dx = -dx;
-        if (dy < 0) dy = -dy;
-        return dx < 32f && dy < 32f;
+    public boolean encostouNoPlayer(PersonagemTeste player) {
+        cajaInimigo.set(this.x + 4f, this.y + 4f, 24f, 24f);
+        return cajaInimigo.overlaps(player.getCaixaPersonagem());
     }
 
     public void render(SpriteBatch batch) {
-        batch.draw(texture, x, y, 32, 32);
+        batch.draw(frameAtual, x, y, 32, 32);
     }
 
-    public void dispose() { texture.dispose(); }
+    public void dispose() {
+        spriteSheet.dispose();
+    }
 
     public int getForca() { return forca; }
     public int getVida()  { return vida;  }
