@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class InimigosSnake {
+public class QuartoInimigo {
     private int forca;
     private int vida;
     private float x, y;
@@ -22,7 +22,7 @@ public class InimigosSnake {
 
     private float direcaoX;
     private float direcaoY;
-    private int contadorDirecao = 0; // 0 para Cima, 1 para Baixo
+    private int contadorDirecao = 0;
 
     private float limiteW;
     private float limiteH;
@@ -31,7 +31,7 @@ public class InimigosSnake {
     private final Rectangle cajaInimigo = new Rectangle();
     private final Rectangle caixaBloco   = new Rectangle();
 
-    public InimigosSnake(int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa) {
+    public QuartoInimigo(int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa) {
         this.forca   = forca;
         this.vida    = vida;
         this.x       = x;
@@ -49,21 +49,20 @@ public class InimigosSnake {
 
         this.frameAtual = frames[0];
 
-        // Começa movendo para cima
         direcaoX = 0;
         direcaoY = 1;
         contadorDirecao = 0;
     }
 
-    // Alterna estritamente entre Cima e Baixo
+
     private void novaDirecao() {
         if (contadorDirecao == 0) {
             direcaoX = 0;
-            direcaoY = -1; // Muda para Baixo
+            direcaoY = -1;
             contadorDirecao = 1;
         } else {
             direcaoX = 0;
-            direcaoY = 1;  // Muda para Cima
+            direcaoY = 1;
             contadorDirecao = 0;
         }
     }
@@ -86,10 +85,9 @@ public class InimigosSnake {
     }
 
     public void update(float delta) {
-        // Como ela só anda no eixo Y, novoX sempre será o x atual
         float novoY = y + direcaoY * speed * delta;
 
-        // Se colidir verticalmente com o mapa, para o movimento e inverte o sentido
+
         if (colideComMapa(x, novoY)) {
             novoY = y;
             novaDirecao();
@@ -97,7 +95,6 @@ public class InimigosSnake {
 
         y = novoY;
 
-        // Limites da janela do jogo (Garante que ela não saia da tela por segurança)
         if (y < 0)            { y = 0;            novaDirecao(); }
         if (y + 32 > limiteH) { y = limiteH - 32; novaDirecao(); }
 

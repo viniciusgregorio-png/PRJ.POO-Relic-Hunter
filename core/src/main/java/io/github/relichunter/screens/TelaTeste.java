@@ -11,7 +11,7 @@ import io.github.relichunter.entidades.Bau;
 import io.github.relichunter.entidades.PedraEmpurravel;
 import io.github.relichunter.entidades.PedraQueCai;
 import io.github.relichunter.entidades.Rubi;
-import io.github.relichunter.inimigos.InimigosSnake;
+import io.github.relichunter.inimigos.*;
 
 public class TelaTeste implements Screen {
 
@@ -25,7 +25,12 @@ public class TelaTeste implements Screen {
     private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
     private boolean jaLiberouNovosRubis = false;
     private Bau bau;
-    private InimigosSnake snake;
+    private PrimeiroInimigo snake;
+    private SegundoInimigo snakeS;
+    private TerceiroInimigo snakeT;
+    private QuartoInimigo snakeQuarto;
+    private QuintoInimigo snakeQuinto;
+
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -56,7 +61,15 @@ public class TelaTeste implements Screen {
         bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F,  personaje, arrayParaOBau);
         pedraQueCai = new PedraQueCai(1.0F, 320.0F, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL);
         pedraEmpurravel = new PedraEmpurravel(129.0F, 129.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
-        snake = new InimigosSnake(10, 100, 224.0F, 128.0F, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        snake = new PrimeiroInimigo(10, 100, 224.0F, 128.0F, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        snakeS = new SegundoInimigo(10, 100, 223.0f, 127,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        snakeT = new TerceiroInimigo(10, 100, 222f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        snakeQuarto = new QuartoInimigo(10, 100, 346f, 125f,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+        snakeQuinto = new QuintoInimigo(10, 100, 220f, 124f,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+
+
+
+
     }
 
     @Override
@@ -76,6 +89,10 @@ public class TelaTeste implements Screen {
 
         bau.update(delta);
         snake.update(delta);
+        snakeS.update(delta);
+        snakeT.update(delta);
+        snakeQuarto.update(delta);
+        snakeQuinto.update(delta);
         if (bau.isFoiAberto() && !jaLiberouNovosRubis){
             listaRubis.add(new Rubi(96.0F, 128.0F, 28.0F, 28.0F, personaje));
             listaRubis.add(new Rubi(160.0F, 128.0F, 28.0F, 28.0F, personaje));
@@ -95,6 +112,10 @@ public class TelaTeste implements Screen {
         mapa.desenhar(batch, ALTURA_VIRTUAL);
         personaje.desenhar(batch, ALTURA_VIRTUAL);
         snake.render(batch);
+        snakeS.render(batch);
+        snakeT.render(batch);
+        snakeQuarto.render(batch);
+        snakeQuinto.render(batch);
         batch.end();
 
         pedraQueCai.render(camera);
@@ -128,5 +149,9 @@ public class TelaTeste implements Screen {
         }
         bau.dispose();
         snake.dispose();
+        snakeS.dispose();
+        snakeT.dispose();
+        snakeQuarto.dispose();
+        snakeQuinto.dispose();
     }
 }
