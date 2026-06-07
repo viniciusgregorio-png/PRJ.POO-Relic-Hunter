@@ -134,7 +134,7 @@ public class TelaTeste implements Screen {
             && touchPos.y >= hudY
             && touchPos.y <= hudY + RESET_BUTTON_SIZE) {
 
-            game.setScreen(new EndGameScreen(game, getTotalRubisColetados()));
+            game.setScreen(new TelaTeste(game));
         }
     }
 
