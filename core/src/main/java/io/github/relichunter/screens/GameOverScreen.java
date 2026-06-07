@@ -1,9 +1,7 @@
 package io.github.relichunter.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Input.Buttons;
@@ -16,8 +14,6 @@ public class GameOverScreen implements Screen {
 
     private SpriteBatch batch;
     private Texture background;
-
-    private int selectedOption = 0;
 
     public GameOverScreen(Main game) {
         this.game = game;
@@ -52,32 +48,6 @@ public class GameOverScreen implements Screen {
 
         int largura = Gdx.graphics.getWidth();
         int altura = Gdx.graphics.getHeight();
-
-        // Navegação por teclado (opcional)
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.A)
-            || Gdx.input.isKeyJustPressed(Input.Keys.UP)
-            || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-
-            selectedOption = 0;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.D)
-            || Gdx.input.isKeyJustPressed(Input.Keys.DOWN)
-            || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-
-            selectedOption = 1;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-
-            if (selectedOption == 0) {
-                restartGame();
-            } else {
-                backToMenu();
-            }
-        }
 
         if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
 
@@ -115,13 +85,11 @@ public class GameOverScreen implements Screen {
 
     private void restartGame() {
 
-        dispose();
         game.setScreen(new TelaTeste(game));
     }
 
     private void backToMenu() {
 
-        dispose();
         game.setScreen(new SplashScreen(game));
     }
 
@@ -143,6 +111,7 @@ public class GameOverScreen implements Screen {
     @Override
     public void hide() {
 
+        dispose();
     }
 
     @Override

@@ -10,4 +10,6 @@ inimigo.png
 logoRelic.png
 mapa.tmx
 parede.png
+resetGame.png
 snake_spritesheet.png
+star.png

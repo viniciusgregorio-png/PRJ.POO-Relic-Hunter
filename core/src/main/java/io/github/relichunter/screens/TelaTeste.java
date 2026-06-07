@@ -1,12 +1,15 @@
 package io.github.relichunter.screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -21,6 +24,7 @@ public class TelaTeste implements Screen {
 
     private final Main game;
     private SpriteBatch batch;
+    private Texture resetButton;
     private MapaTeste mapa;
     private PersonagemTeste personaje;
 
@@ -44,6 +48,10 @@ public class TelaTeste implements Screen {
     private final int LARGURA_VIRTUAL = 480;
     private final int ALTURA_VIRTUAL = 320;
 
+    private static final float RESET_BUTTON_SIZE = 48f;
+    private static final float RESET_BUTTON_X = 8f;
+    private static final float RESET_BUTTON_Y = 268f;
+
     public TelaTeste(Main game) {
         this.game = game;
     }
@@ -51,6 +59,7 @@ public class TelaTeste implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
+        resetButton = new Texture("resetGame.png");
         mapa = new MapaTeste();
         personaje = new PersonagemTeste();
 
@@ -98,6 +107,62 @@ public class TelaTeste implements Screen {
         pedraEmpurravel = new PedraEmpurravel(129.0F, 129.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
     }
 
+    private void handleResetButton() {
+
+        if (!Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            return;
+        }
+
+        Vector3 touchPos = new Vector3(
+            Gdx.input.getX(),
+            Gdx.input.getY(),
+            0
+        );
+
+        viewport.unproject(touchPos);
+
+        float hudX = camera.position.x
+            - viewport.getWorldWidth() / 2f
+            + RESET_BUTTON_X;
+
+        float hudY = camera.position.y
+            - viewport.getWorldHeight() / 2f
+            + RESET_BUTTON_Y;
+
+        if (touchPos.x >= hudX
+            && touchPos.x <= hudX + RESET_BUTTON_SIZE
+            && touchPos.y >= hudY
+            && touchPos.y <= hudY + RESET_BUTTON_SIZE) {
+
+            game.setScreen(new EndGameScreen(game, getTotalRubisColetados()));
+        }
+    }
+
+    private void drawHUD() {
+
+        float hudX = camera.position.x
+            - viewport.getWorldWidth() / 2f
+            + RESET_BUTTON_X;
+
+        float hudY = camera.position.y
+            - viewport.getWorldHeight() / 2f
+            + RESET_BUTTON_Y;
+
+        batch.setProjectionMatrix(camera.combined);
+
+        batch.begin();
+
+        batch.draw(
+            resetButton,
+            hudX,
+            hudY,
+            RESET_BUTTON_SIZE,
+            RESET_BUTTON_SIZE
+        );
+
+        batch.end();
+    }
+
     private void atualizarCameraSeguirPlayer() {
         // Foca o centro da câmera no Personagem
         camera.position.x = personaje.getPosX() + 16f;
@@ -121,6 +186,7 @@ public class TelaTeste implements Screen {
 
     @Override
     public void render(float delta) {
+
         ScreenUtils.clear(0.15F, 0.15F, 0.15F, 1.0F);
 
         // Chave liga/desliga de teste (Teclado I)
@@ -131,6 +197,8 @@ public class TelaTeste implements Screen {
         // Lógica de física e câmera seguidora
         personaje.atualizar(mapa, delta);
         atualizarCameraSeguirPlayer();
+
+        handleResetButton();
 
         pedraQueCai.update(delta);
         pedraEmpurravel.update(delta);
@@ -169,6 +237,8 @@ public class TelaTeste implements Screen {
         if (snakeQuinto != null) snakeQuinto.render(batch);
         batch.end();
 
+        drawHUD();
+
         // 3. Renderiza os itens e pedras secundárias
         pedraQueCai.render(camera);
         pedraEmpurravel.render(camera);
@@ -190,6 +260,7 @@ public class TelaTeste implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        resetButton.dispose();
         mapa.dispose();
         personaje.dispose();
         pedraQueCai.dispose();
@@ -203,5 +274,18 @@ public class TelaTeste implements Screen {
         if (snake != null) snake.dispose();
         if (snakeT != null) snakeT.dispose();
         if (snakeQuinto != null) snakeQuinto.dispose();
+    }
+
+    public int getTotalRubisColetados() {
+
+        int total = 0;
+
+        for (Rubi rubi : listaRubis) {
+            if (rubi.isFoiColetado()) {
+                total++;
+            }
+        }
+
+        return total;
     }
 }

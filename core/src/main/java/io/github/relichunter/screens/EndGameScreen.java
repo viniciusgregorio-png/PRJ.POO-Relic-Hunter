@@ -1,7 +1,6 @@
 package io.github.relichunter.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,14 +11,18 @@ import io.github.relichunter.Main;
 public class EndGameScreen implements Screen {
 
     private final Main game;
+    private final int totalRubisColetados;
 
     private SpriteBatch batch;
+
     private Texture background;
+    private Texture star;
 
-    private int selectedOption = 0;
+    private int earnedStars;
 
-    public EndGameScreen(Main game) {
+    public EndGameScreen(Main game, int totalRubisColetados) {
         this.game = game;
+        this.totalRubisColetados = totalRubisColetados;
     }
 
     @Override
@@ -28,6 +31,9 @@ public class EndGameScreen implements Screen {
         batch = new SpriteBatch();
 
         background = new Texture("endGame.png");
+        star = new Texture("star.png");
+
+        earnedStars = calculateStars(totalRubisColetados);
     }
 
     @Override
@@ -44,8 +50,57 @@ public class EndGameScreen implements Screen {
         batch.getProjectionMatrix().setToOrtho2D(0, 0, largura, altura);
 
         batch.begin();
+
         batch.draw(background, 0, 0, largura, altura);
+
+        drawStars(largura, altura);
+
         batch.end();
+    }
+
+    private void drawStars(int largura, int altura) {
+
+        float scaleX = largura / 1312f;
+        float scaleY = altura / 856f;
+
+        float starSize = 134f * scaleX;
+
+        float[][] positions = {
+            {487f, 316f},
+            {608, 316f},
+            {732f, 316f}
+        };
+
+        for (int i = 0; i < earnedStars; i++) {
+
+            float x = positions[i][0] * scaleX;
+            float y = (856f - positions[i][1] - 95f) * scaleY;
+
+            batch.draw(
+                star,
+                x,
+                y,
+                starSize,
+                starSize
+            );
+        }
+    }
+
+    private int calculateStars(int rubies) {
+
+        if (rubies == 0) {
+            return 0;
+        }
+
+        if (rubies <= 4) {
+            return 1;
+        }
+
+        if (rubies <= 7) {
+            return 2;
+        }
+
+        return 3;
     }
 
     private void handleInput() {
@@ -53,44 +108,16 @@ public class EndGameScreen implements Screen {
         int largura = Gdx.graphics.getWidth();
         int altura = Gdx.graphics.getHeight();
 
-        // Navegação por teclado
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.A)
-            || Gdx.input.isKeyJustPressed(Input.Keys.UP)
-            || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-
-            selectedOption = 0;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)
-            || Gdx.input.isKeyJustPressed(Input.Keys.D)
-            || Gdx.input.isKeyJustPressed(Input.Keys.DOWN)
-            || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-
-            selectedOption = 1;
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-
-            if (selectedOption == 0) {
-                restartGame();
-            } else {
-                exitGame();
-            }
-        }
-
         if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
 
             float mouseX = Gdx.input.getX();
             float mouseY = altura - Gdx.input.getY();
 
-            // JOGAR NOVAMENTE
             float retryX = largura * 0.31f;
             float retryY = altura * 0.03f;
             float retryW = largura * 0.17f;
             float retryH = altura * 0.10f;
 
-            // FECHAR JOGO
             float exitX = largura * 0.52f;
             float exitY = altura * 0.03f;
             float exitW = largura * 0.17f;
@@ -117,11 +144,11 @@ public class EndGameScreen implements Screen {
 
     private void restartGame() {
 
-        dispose();
         game.setScreen(new TelaTeste(game));
     }
 
     private void exitGame() {
+
         Gdx.app.exit();
     }
 
@@ -143,6 +170,7 @@ public class EndGameScreen implements Screen {
     @Override
     public void hide() {
 
+        dispose();
     }
 
     @Override
@@ -153,5 +181,8 @@ public class EndGameScreen implements Screen {
 
         if (background != null)
             background.dispose();
+
+        if (star != null)
+            star.dispose();
     }
 }
