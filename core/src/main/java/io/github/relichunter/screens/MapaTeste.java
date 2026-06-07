@@ -1,62 +1,52 @@
 package io.github.relichunter.screens;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class MapaTeste {
-
-    private final Texture chao;
-    private final Texture parede;
+    private TiledMap tiledMap;
+    private OrthogonalTiledMapRenderer mapaRenderer;
+    private TiledMapTileLayer camadaColisao;
 
     public static final int TAMANHO_BLOCO = 32;
 
-    private final int[][] matriz = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1},
-        {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-        {1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-        {1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1},
-        {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
-        {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    };
-
     public MapaTeste() {
-        chao = new Texture("chao.png");
-        parede = new Texture("parede.png");
+        this.tiledMap = new TmxMapLoader().load("mapa.tmx");
+        this.mapaRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+
+        this.camadaColisao = (TiledMapTileLayer) tiledMap.getLayers().get("paredes");
     }
 
-    public void desenhar(SpriteBatch batch, int alturaJanela) {
-        for (int linha = 0; linha < matriz.length; linha++) {
-            for (int coluna = 0; coluna < matriz[linha].length; coluna++) {
-
-                int xPixel = coluna * TAMANHO_BLOCO;
-                int yPixel = alturaJanela - ((linha + 1) * TAMANHO_BLOCO);
-
-                if (matriz[linha][coluna] == 1) {
-                    batch.draw(parede, xPixel, yPixel, TAMANHO_BLOCO, TAMANHO_BLOCO);
-                } else {
-                    batch.draw(chao, xPixel, yPixel, TAMANHO_BLOCO, TAMANHO_BLOCO);
-                }
-            }
-        }
+    public void render(OrthographicCamera camera) {
+        mapaRenderer.setView(camera);
+        mapaRenderer.render();
     }
 
-    public boolean isEspacoLivre(int coluna, int linha) {
-        if (linha < 0 || linha >= matriz.length || coluna < 0 || coluna >= matriz[0].length) {
+    public boolean isEspacoLivre(int coluna, int javaLinha) {
+        if (camadaColisao == null) return true;
+
+        if (coluna < 0 || coluna >= camadaColisao.getWidth() || javaLinha < 0 || javaLinha >= camadaColisao.getHeight()) {
             return false;
         }
-        return matriz[linha][coluna] == 0;
+
+        TiledMapTileLayer.Cell celula = camadaColisao.getCell(coluna, javaLinha);
+
+        return celula == null;
     }
 
     public int getQuantidadeLinhas() {
-        return matriz.length;
+        return camadaColisao != null ? camadaColisao.getHeight() : 40;
+    }
+
+    public TiledMap getTiledMap() {
+        return tiledMap;
     }
 
     public void dispose() {
-        chao.dispose();
-        parede.dispose();
+        tiledMap.dispose();
+        mapaRenderer.dispose();
     }
 }

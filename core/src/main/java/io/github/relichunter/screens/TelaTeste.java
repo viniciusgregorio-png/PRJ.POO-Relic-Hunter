@@ -1,8 +1,12 @@
 package io.github.relichunter.screens;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -25,16 +29,18 @@ public class TelaTeste implements Screen {
     private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
     private boolean jaLiberouNovosRubis = false;
     private Bau bau;
+
+    // Nossos inimigos dinâmicos
     private PrimeiroInimigo snake;
-    private SegundoInimigo snakeS;
     private TerceiroInimigo snakeT;
-    private QuartoInimigo snakeQuarto;
     private QuintoInimigo snakeQuinto;
 
+    private boolean inimigosAtivos = true;
 
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    // Resolução da janela que foca no player
     private final int LARGURA_VIRTUAL = 480;
     private final int ALTURA_VIRTUAL = 320;
 
@@ -50,77 +56,122 @@ public class TelaTeste implements Screen {
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
-        camera.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0f);
 
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
-        listaRubis.add(new Rubi(160.0F, 64.0F, 28.0F, 28.0F, personaje));
-        listaRubis.add(new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje));
-        listaRubis.add(new Rubi(288.0F, 64.0F, 28.0F, 28.0F, personaje));
 
+        // ─── LEITURA AUTOMÁTICA DE OBJETOS DO TILED ───
+        MapLayer camadaObjetos = mapa.getTiledMap().getLayers().get("objetos");
+
+        if (camadaObjetos != null) {
+            for (MapObject objeto : camadaObjetos.getObjects()) {
+                float objX = objeto.getProperties().get("x", Float.class);
+                float objY = objeto.getProperties().get("y", Float.class);
+                String nome = objeto.getName();
+
+                if (nome == null) continue;
+
+                // Spawna o objeto de acordo com o nome dado na propriedade do Tiled
+                if (nome.equalsIgnoreCase("player")) {
+                    personaje.setX(objX);
+                    personaje.setY(objY);
+                }
+                else if (nome.equalsIgnoreCase("rubi")) {
+                    listaRubis.add(new Rubi(objX, objY, 28.0F, 28.0F, personaje));
+                }
+                else if (nome.equalsIgnoreCase("snake_horizontal")) {
+                    snake = new PrimeiroInimigo(10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+                }
+                else if (nome.equalsIgnoreCase("snake_vertical_meio")) {
+                    snakeT = new TerceiroInimigo(10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+                }
+                else if (nome.equalsIgnoreCase("snake_vertical_direita")) {
+                    snakeQuinto = new QuintoInimigo(10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+                }
+            }
+        }
+
+        // Inicializa os demais elementos vinculados
         Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
-        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F,  personaje, arrayParaOBau);
+        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F, personaje, arrayParaOBau); // Pode ser mantido fixo ou movido via Tiled
+
         pedraQueCai = new PedraQueCai(1.0F, 320.0F, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL);
         pedraEmpurravel = new PedraEmpurravel(129.0F, 129.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
-        snake = new PrimeiroInimigo(10, 100, 224.0F, 128.0F, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
-        snakeS = new SegundoInimigo(10, 100, 223.0f, 127,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
-        snakeT = new TerceiroInimigo(10, 100, 222f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
-        snakeQuarto = new QuartoInimigo(10, 100, 346f, 125f,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
-        snakeQuinto = new QuintoInimigo(10, 100, 220f, 124f,  LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa);
+    }
 
+    private void atualizarCameraSeguirPlayer() {
+        // Foca o centro da câmera no Personagem
+        camera.position.x = personaje.getPosX() + 16f;
+        camera.position.y = personaje.getPosY() + 16f;
 
+        // Limita a câmera dentro das bordas do mapa (60 colunas x 32px e 40 linhas x 32px)
+        float metadeLarguraCam = viewport.getWorldWidth() / 2f;
+        float metadeAlturaCam = viewport.getWorldHeight() / 2f;
 
+        float limiteDireitoMapa = 60 * 32; // 1920 px
+        float limiteSuperiorMapa = 40 * 32; // 1280 px
 
+        if (camera.position.x < metadeLarguraCam) camera.position.x = metadeLarguraCam;
+        if (camera.position.x > limiteDireitoMapa - metadeLarguraCam) camera.position.x = limiteDireitoMapa - metadeLarguraCam;
+
+        if (camera.position.y < metadeAlturaCam) camera.position.y = metadeAlturaCam;
+        if (camera.position.y > limiteSuperiorMapa - metadeAlturaCam) camera.position.y = limiteSuperiorMapa - metadeAlturaCam;
+
+        camera.update();
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15F, 0.15F, 0.15F, 1.0F);
 
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
+        // Chave liga/desliga de teste (Teclado I)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+            inimigosAtivos = !inimigosAtivos;
+        }
 
+        // Lógica de física e câmera seguidora
         personaje.atualizar(mapa, delta);
+        atualizarCameraSeguirPlayer();
+
         pedraQueCai.update(delta);
         pedraEmpurravel.update(delta);
 
         for (Rubi rubi : listaRubis) {
             rubi.update(delta);
         }
-
         bau.update(delta);
-        snake.update(delta);
-        snakeS.update(delta);
-        snakeT.update(delta);
-        snakeQuarto.update(delta);
-        snakeQuinto.update(delta);
-        if (bau.isFoiAberto() && !jaLiberouNovosRubis){
-            listaRubis.add(new Rubi(96.0F, 128.0F, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(160.0F, 128.0F, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(224.0F, 64.0F, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(352.0F, 128.0F, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(288.0F, 128.0F, 28.0F, 28.0F, personaje));
 
-            jaLiberouNovosRubis = true;
+        if (inimigosAtivos) {
+            if (snake != null) snake.update(delta);
+            if (snakeT != null) snakeT.update(delta);
+            if (snakeQuinto != null) snakeQuinto.update(delta);
         }
 
-        if (snake.encostouNoPlayer(personaje)) {
-            game.setScreen(new GameOverScreen(game));
-            return;
+        // Verificação de Game Over com proteção contra null (caso não use todas as cobras no Tiled)
+        if (inimigosAtivos) {
+            if ((snake != null && snake.encostouNoPlayer(personaje)) ||
+                (snakeT != null && snakeT.encostouNoPlayer(personaje)) ||
+                (snakeQuinto != null && snakeQuinto.encostouNoPlayer(personaje))) {
+
+                game.setScreen(new GameOverScreen(game));
+                return;
+            }
         }
 
+        // 1. RENDERIZA O MAPA DO TILED PRIMEIRO (Chão e Paredes automáticos)
+        mapa.render(camera);
+
+        // 2. RENDERIZA OS SPRITES POR CIMA DO MAPA
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        mapa.desenhar(batch, ALTURA_VIRTUAL);
         personaje.desenhar(batch, ALTURA_VIRTUAL);
-        snake.render(batch);
-        snakeS.render(batch);
-        snakeT.render(batch);
-        snakeQuarto.render(batch);
-        snakeQuinto.render(batch);
+        if (snake != null) snake.render(batch);
+        if (snakeT != null) snakeT.render(batch);
+        if (snakeQuinto != null) snakeQuinto.render(batch);
         batch.end();
 
+        // 3. Renderiza os itens e pedras secundárias
         pedraQueCai.render(camera);
         pedraEmpurravel.render(camera);
-
         for (Rubi rubi : listaRubis) {
             rubi.render(camera);
         }
@@ -148,10 +199,9 @@ public class TelaTeste implements Screen {
             rubi.dispose();
         }
         bau.dispose();
-        snake.dispose();
-        snakeS.dispose();
-        snakeT.dispose();
-        snakeQuarto.dispose();
-        snakeQuinto.dispose();
+
+        if (snake != null) snake.dispose();
+        if (snakeT != null) snakeT.dispose();
+        if (snakeQuinto != null) snakeQuinto.dispose();
     }
 }

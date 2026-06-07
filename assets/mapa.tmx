@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" name="Mapa" tilewidth="32" tileheight="32" tilecount="24" columns="6">
+  <image source="1_Mine_Tileset_1.png" width="192" height="128"/>
+ </tileset>
+ <layer id="2" name="Camada de Blocos 2" width="60" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztw0ENAAAMA6FTUP9yp2F/SFg1VVVVVVVVVVVV3w+sQoNB
+  </data>
+ </layer>
+ <objectgroup id="4" name="Camada de Objetos 1"/>
+ <layer id="1" name="paredes" width="60" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztWu2KAyEMzF1/9Fpot3B3fb571D7aKVQqou3kwzXSHQiCRLOz0USzuyeirzeRQ5ATrY/LAJsRCz347unxDg5FH/LeEP2kh/L9CPJpILsK39ie77JkfQhQ/aTnwb8j+R4bLbq+0DXohe+l0VrGloXem+93kJ+7/Fb6ngmqn/Q88NUgcPnj6I/mW8YFbj7iSohHt/xZro0WXV/oGmz5V7p/vcOaL/d80hrTY32V+ciCL6qf718L+wiexauN7+u5OPobX918CBC+1ueNpJvzrY3hnnes8lEvjL4f9TpXWNyZLSXxHVHj6LFHEZsb3/Vs08q2E1/LOMiJl0Rj+I4E174mvtXqk5oYy4m5SZfLV+Ofsp4jGZ/GcutA0v2ryW8z8tXMt/GV25iNryQnled67r1Balc6n4d8tCa094VWPgrv8uZRtOfJcs94r1P24hvrx+i3yrxWmXAE+7j9HvxbG1OrB7RqBJz+XnyR79S7YsyrZ/XMVzJHjt58pTmwvNPN4l8tZvJv9K3FPyEzSFyP/7pUSjs=
+  </data>
+ </layer>
+</map>

@@ -22,7 +22,7 @@ public class PrimeiroInimigo {
 
     private float direcaoX;
     private float direcaoY;
-    private int contadorDirecao = 0; // 0 para Cima, 1 para Baixo
+    private int contadorDirecao = 0; // 0 para Direita, 1 para Esquerda
 
     private float limiteW;
     private float limiteH;
@@ -49,20 +49,21 @@ public class PrimeiroInimigo {
 
         this.frameAtual = frames[0];
 
-        direcaoX = 0;
-        direcaoY = 1;
+        // Começa movendo para a DIREITA
+        direcaoX = 1;
+        direcaoY = 0;
         contadorDirecao = 0;
     }
 
-
+    // Alterna estritamente entre Esquerda e Direita ao bater na parede
     private void novaDirecao() {
         if (contadorDirecao == 0) {
-            direcaoX = 0;
-            direcaoY = -1; //
+            direcaoX = -1; // Muda para Esquerda
+            direcaoY = 0;
             contadorDirecao = 1;
         } else {
-            direcaoX = 0;
-            direcaoY = 1;
+            direcaoX = 1;  // Muda para Direita
+            direcaoY = 0;
             contadorDirecao = 0;
         }
     }
@@ -85,23 +86,36 @@ public class PrimeiroInimigo {
     }
 
     public void update(float delta) {
-        float novoY = y + direcaoY * speed * delta;
+        // Movimento focado no eixo X
+        float novoX = x + direcaoX * speed * delta;
 
-
-        if (colideComMapa(x, novoY)) {
-            novoY = y;
+        if (colideComMapa(novoX, y)) {
+            // Recua um pixel para descolar do bloco colidido e muda de direção
+            x = x - (direcaoX * 1f);
             novaDirecao();
+        } else {
+            x = novoX;
         }
 
-        y = novoY;
+        // Limites horizontais da tela por segurança
+        if (x < 0)            { x = 0;            novaDirecao(); }
+        if (x + 32 > limiteW) { x = limiteW - 32; novaDirecao(); }
 
-        if (y < 0)            { y = 0;            novaDirecao(); }
-        if (y + 32 > limiteH) { y = limiteH - 32; novaDirecao(); }
-
-        // Atualização dos frames de animação
+        // Animação dos frames
         tempoAnimacao += delta;
         int frameId = (int)(tempoAnimacao / VELOCIDADE_ANIMACAO) % 7;
         frameAtual = frames[frameId];
+
+        // FLIP AUTOMÁTICO: Inverte o sprite para olhar para onde está andando
+        if (direcaoX < 0) {
+            if (!frameAtual.isFlipX()) {
+                frameAtual.flip(true, false);
+            }
+        } else if (direcaoX > 0) {
+            if (frameAtual.isFlipX()) {
+                frameAtual.flip(true, false);
+            }
+        }
     }
 
     public boolean encostouNoPlayer(PersonagemTeste player) {

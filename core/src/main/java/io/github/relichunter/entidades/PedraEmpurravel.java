@@ -1,124 +1,130 @@
 package io.github.relichunter.entidades;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class PedraEmpurravel extends Obstaculo {
-    private ShapeRenderer shapeRenderer;
-    private boolean estaRolando;
-    private float direcao;
-    private PersonagemTeste personagem;
-    private final Rectangle caixaPedra = new Rectangle();
-    private final GerenciadorColisao colisao;
+public class PedraEmpurravel {
+    private float x, y;
+    private float largura, altura;
+    private float velocidade = 150f;
+    private int direcao = 0; // -1 Esquerda, 1 Direita, 0 Parada
+    private boolean estaRolando = false;
 
-    public PedraEmpurravel(float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem, int alturaVirtual) {
+    private MapaTeste mapa;
+    private PersonagemTeste personagem;
+    private float alturaVirtual;
+
+    private final Rectangle caixaPedra = new Rectangle();
+    private final Rectangle caixaPlayer = new Rectangle();
+    private final Rectangle caixaBloco = new Rectangle();
+    private final ShapeRenderer shapeRenderer;
+
+    public PedraEmpurravel(float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem, float alturaVirtual) {
         this.x = x;
         this.y = y;
         this.largura = largura;
         this.altura = altura;
-        this.estaRolando = false;
-        this.direcao = 0;
-        this.personagem = personagem;
+        this.mapa = mapa;
+        this.personagem = FitsPersonagem(personagem);
+        this.alturaVirtual = alturaVirtual;
+
+        this.caixaPedra.set(x, y, largura, altura);
         this.shapeRenderer = new ShapeRenderer();
-        this.colisao = new GerenciadorColisao(mapa, alturaVirtual);
     }
 
-    @Override
+    private PersonagemTeste FitsPersonagem(PersonagemTeste p) {
+        return p;
+    }
+
     public void update(float delta) {
-        caixaPedra.set(x, y, largura, altura);
+        caixaPlayer.set(personagem.getCaixaPersonagem());
 
-        // Obtenção direta da caixa de colisão do jogador para precisão absoluta
-        Rectangle caixaPlayer = personagem.getCaixaPersonagem();
+        if (!estaRolando) {
+            if (caixaPedra.overlaps(caixaPlayer)) {
+                String lado = calcularLadoColisao();
 
-        if (caixaPedra.overlaps(caixaPlayer)) {
-            // 1. Identificação do lado de colisão inicial pelo gerenciador
-            String lado = colisao.ladoColisao(caixaPlayer, caixaPedra);
-
-            // 🛡️ FILTRO DE SEGURANÇA (Resolução de conflito de colisão diagonal)
-            float centroPlayerX = caixaPlayer.x + caixaPlayer.width / 2f;
-            float centroStoneX = caixaPedra.x + caixaPedra.width / 2f;
-            float centroPlayerY = caixaPlayer.y + caixaPlayer.height / 2f;
-            float centroStoneY = caixaPedra.y + caixaPedra.height / 2f;
-
-            float diffX = Math.abs(centroPlayerX - centroStoneX);
-            float diffY = Math.abs(centroPlayerY - centroStoneY);
-
-            if (diffX > diffY) {
-                if (centroPlayerX < centroStoneX) {
-                    lado = "ESQUERDA";
-                } else {
-                    lado = "DIREITA";
-                }
-            } else {
-                if (centroPlayerY < centroStoneY) {
-                    lado = "ABAIXO";
-                } else {
-                    lado = "ACIMA";
-                }
-            }
-
-            // 2. Aplicação do comportamento seguro com base no lado corrigido
-            // Subtraímos/somamos uma folga de segurança (ex: 2.1f) para compensar o alinhamento
-            // do sprite (normalmente maior) com a hitbox interna, prevenindo que fiquem colados.
-            switch (lado) {
-                case "ESQUERDA":
-                    direcao = 1; // Movimento para a direita
-                    estaRolando = true;
-                    break;
-                case "DIREITA":
-                    direcao = -1; // Movimento para a esquerda
-                    estaRolando = true;
-                    break;
-                case "ACIMA":
-                    // Bloqueio superior limpo
-                    personagem.setPosY(y + altura + 0.1f);
-                    estaRolando = false;
-                    break;
-                case "ABAIXO":
-                    // Bloqueio inferior compensando possíveis offsets do eixo Y
-                    personagem.setPosY(y - caixaPlayer.height - 2.1f);
-                    estaRolando = false;
-                    break;
-            }
-
-            // 3. Execução do movimento físico da pedra
-            if (estaRolando) {
-                float novaX = x + direcao * 150 * delta;
-
-                if (colisao.podeMoverX(caixaPedra, novaX)) {
-                    x = novaX;
-
-                    // O jogador acompanha a pedra mantendo a distância exata da sua hitbox
-                    if (lado.equals("ESQUERDA")) {
-                        personagem.setPosX(x - caixaPlayer.width - 2.1f);
-                    } else if (lado.equals("DIREITA")) {
-                        personagem.setPosX(x + largura - 1.9f);
-                    }
-                } else {
-                    estaRolando = false;
-
-                    // Se a pedra colidir com a parede, o jogador é bloqueado sem atravessar
-                    if (lado.equals("ESQUERDA")) {
-                        personagem.setPosX(x - caixaPlayer.width - 2.1f);
-                    } else if (lado.equals("DIREITA")) {
-                        personagem.setPosX(x + largura - 1.9f);
-                    }
+                // 2. Aplicação do comportamento seguro com base no lado corrigido
+                // Subtraímos/somamos uma folga de segurança (ex: 2.1f) para compensar o alinhamento
+                // do sprite (normalmente maior) com a hitbox interna, prevenindo que fiquem colados.
+                switch (lado) {
+                    case "ESQUERDA":
+                        direcao = 1; // Movimento para a direita
+                        estaRolando = true;
+                        break;
+                    case "DIREITA":
+                        direcao = -1; // Movimento para a esquerda
+                        estaRolando = true;
+                        break;
+                    case "ACIMA":
+                        // Bloqueio superior limpo
+                        personagem.setY(y + altura + 0.1f);
+                        estaRolando = false;
+                        break;
+                    case "ABAIXO":
+                        // Bloqueio inferior compensando possíveis offsets do eixo Y
+                        personagem.setY(y - personagem.getAltura() - 2.1f);
+                        estaRolando = false;
+                        break;
                 }
             }
         } else {
-            estaRolando = false;
+            // Movimentação da pedra após o empurrão (Eixo X)
+            float novoX = x + (direcao * velocidade * delta);
+
+            if (colideComMapa(novoX, y)) {
+                estaRolando = false;
+                direcao = 0;
+            } else {
+                x = novoX;
+                caixaPedra.setX(x);
+            }
         }
     }
 
-    @Override
+    private String calcularLadoColisao() {
+        float centroPedraX = x + largura / 2f;
+        float centroPedraY = y + altura / 2f;
+        float centroPlayerX = caixaPlayer.x + caixaPlayer.width / 2f;
+        float centroPlayerY = caixaPlayer.y + caixaPlayer.height / 2f;
+
+        float dx = centroPlayerX - centroPedraX;
+        float dy = centroPlayerY - centroPedraY;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            return (dx > 0) ? "DIREITA" : "ESQUERDA";
+        } else {
+            return (dy > 0) ? "ACIMA" : "ABAIXO";
+        }
+    }
+
+    private boolean colideComMapa(float px, float py) {
+        Rectangle simulaPedra = new Rectangle(px, py, largura, altura);
+        caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
+
+        int larguraMapa = 60;
+        for (int linha = 0; linha < mapa.getQuantidadeLinhas(); linha++) {
+            for (int coluna = 0; coluna < larguraMapa; coluna++) {
+                if (!mapa.isEspacoLivre(coluna, linha)) {
+                    int bx = coluna * MapaTeste.TAMANHO_BLOCO;
+                    int by = linha * MapaTeste.TAMANHO_BLOCO;
+                    caixaBloco.setPosition(bx, by);
+
+                    if (simulaPedra.overlaps(caixaBloco)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public void render(OrthographicCamera camera) {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.ORANGE);
+        shapeRenderer.setColor(0.9f, 0.5f, 0.0f, 1.0f); // Laranja para testes
         shapeRenderer.rect(x, y, largura, altura);
         shapeRenderer.end();
     }
@@ -126,4 +132,7 @@ public class PedraEmpurravel extends Obstaculo {
     public void dispose() {
         shapeRenderer.dispose();
     }
+
+    public float getX() { return x; }
+    public float getY() { return y; }
 }
