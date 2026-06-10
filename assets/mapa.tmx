@@ -11,7 +11,7 @@
  <objectgroup id="4" name="Camada de Objetos 1"/>
  <layer id="1" name="paredes" width="60" height="40">
   <data encoding="base64" compression="zlib">
-   eJztWu2KAyEMzF1/9Fpot3B3fb571D7aKVQqou3kwzXSHQiCRLOz0USzuyeirzeRQ5ATrY/LAJsRCz347unxDg5FH/LeEP2kh/L9CPJpILsK39ie77JkfQhQ/aTnwb8j+R4bLbq+0DXohe+l0VrGloXem+93kJ+7/Fb6ngmqn/Q88NUgcPnj6I/mW8YFbj7iSohHt/xZro0WXV/oGmz5V7p/vcOaL/d80hrTY32V+ciCL6qf718L+wiexauN7+u5OPobX918CBC+1ueNpJvzrY3hnnes8lEvjL4f9TpXWNyZLSXxHVHj6LFHEZsb3/Vs08q2E1/LOMiJl0Rj+I4E174mvtXqk5oYy4m5SZfLV+Ofsp4jGZ/GcutA0v2ryW8z8tXMt/GV25iNryQnled67r1Balc6n4d8tCa094VWPgrv8uZRtOfJcs94r1P24hvrx+i3yrxWmXAE+7j9HvxbG1OrB7RqBJz+XnyR79S7YsyrZ/XMVzJHjt58pTmwvNPN4l8tZvJv9K3FPyEzSFyP/7pUSjs=
+   eJztWm1uwyAMZcuPbJE2KnXp+Xq0HiVHG0hYSzybmG/Y+iSLhhicZyDYpLNS6u2fyLuRD1UflwY2LbT64Turox9w3ZnfJPqgJ+X7YuQ1g0wEX1t+OtG7Ogmk+qDXw/i25LswpXR+SedfL3wvTJnr3aJ3JfR5NfLlZHV1xr9345/NillL276PydVbMf574D4ouSE+Cl3X5FsTT750eTZfpALzFfji9wKsb+XuGb17TlnVETemzA1ufPXut2T89blKFyjBN0eMEhrvSO2V4JtjDwvdD6X2nnyP9qQ2/xJfKg6R1vv2h175lgLYoPyzCu5x4PwNPm7Ntya4eKOGtOTbIqYEvrV8vd9/W/KlbJc6DwC+ueLymBi+Bd+WoOzXzhdqItR+ynrnzidDz4Vm5lrSNpRvyvjg86uY9tA29NwrNoaKybeo8R2Fb0p/vfA176cNxNcGrxuuP5/NHvjiOg6gS+mF8sV7MBWXczpX5lqy/3J5FgVfvxLbPexHNZGaL3D7kfHl1qPExs+L++4A3xV866on5MoXMF8bD0q/VVLv2kVYF1pfim8IqDZUvsDlECH1ifP5V0wIzy75Tj2hNmfPmpNvbD6Ic7pRxjcVo41vKkYaXzuXc/wnZASx6+8bBNlYSg==
   </data>
  </layer>
 </map>
