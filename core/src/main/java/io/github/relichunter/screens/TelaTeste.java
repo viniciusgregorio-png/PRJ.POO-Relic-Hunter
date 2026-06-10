@@ -34,7 +34,6 @@ public class TelaTeste implements Screen {
     private boolean jaLiberouNovosRubis = false;
     private Bau bau;
 
-    // Nossos inimigos dinâmicos
     private PrimeiroInimigo snake;
     private TerceiroInimigo snakeT;
     private QuintoInimigo snakeQuinto;
@@ -44,7 +43,6 @@ public class TelaTeste implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
-    // Resolução da janela que foca no player
     private final int LARGURA_VIRTUAL = 480;
     private final int ALTURA_VIRTUAL = 320;
 
@@ -68,7 +66,6 @@ public class TelaTeste implements Screen {
 
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
 
-        // ─── LEITURA AUTOMÁTICA DE OBJETOS DO TILED ───
         MapLayer camadaObjetos = mapa.getTiledMap().getLayers().get("objetos");
 
         if (camadaObjetos != null) {
@@ -79,7 +76,6 @@ public class TelaTeste implements Screen {
 
                 if (nome == null) continue;
 
-                // Spawna o objeto de acordo com o nome dado na propriedade do Tiled
                 if (nome.equalsIgnoreCase("player")) {
                     personaje.setX(objX);
                     personaje.setY(objY);
@@ -99,7 +95,6 @@ public class TelaTeste implements Screen {
             }
         }
 
-        // Inicializa os demais elementos vinculados
         Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
         bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F, personaje, arrayParaOBau); // Pode ser mantido fixo ou movido via Tiled
 
@@ -164,16 +159,14 @@ public class TelaTeste implements Screen {
     }
 
     private void atualizarCameraSeguirPlayer() {
-        // Foca o centro da câmera no Personagem
         camera.position.x = personaje.getPosX() + 16f;
         camera.position.y = personaje.getPosY() + 16f;
 
-        // Limita a câmera dentro das bordas do mapa (60 colunas x 32px e 40 linhas x 32px)
         float metadeLarguraCam = viewport.getWorldWidth() / 2f;
         float metadeAlturaCam = viewport.getWorldHeight() / 2f;
 
-        float limiteDireitoMapa = 60 * 32; // 1920 px
-        float limiteSuperiorMapa = 40 * 32; // 1280 px
+        float limiteDireitoMapa = 60 * 32;
+        float limiteSuperiorMapa = 40 * 32;
 
         if (camera.position.x < metadeLarguraCam) camera.position.x = metadeLarguraCam;
         if (camera.position.x > limiteDireitoMapa - metadeLarguraCam) camera.position.x = limiteDireitoMapa - metadeLarguraCam;
@@ -189,12 +182,10 @@ public class TelaTeste implements Screen {
 
         ScreenUtils.clear(0.15F, 0.15F, 0.15F, 1.0F);
 
-        // Chave liga/desliga de teste (Teclado I)
         if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
             inimigosAtivos = !inimigosAtivos;
         }
 
-        // Lógica de física e câmera seguidora
         personaje.atualizar(mapa, delta);
         atualizarCameraSeguirPlayer();
 
@@ -214,7 +205,6 @@ public class TelaTeste implements Screen {
             if (snakeQuinto != null) snakeQuinto.update(delta);
         }
 
-        // Verificação de Game Over com proteção contra null (caso não use todas as cobras no Tiled)
         if (inimigosAtivos) {
             if ((snake != null && snake.encostouNoPlayer(personaje)) ||
                 (snakeT != null && snakeT.encostouNoPlayer(personaje)) ||
@@ -224,11 +214,8 @@ public class TelaTeste implements Screen {
                 return;
             }
         }
-
-        // 1. RENDERIZA O MAPA DO TILED PRIMEIRO (Chão e Paredes automáticos)
         mapa.render(camera);
 
-        // 2. RENDERIZA OS SPRITES POR CIMA DO MAPA
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         personaje.desenhar(batch, ALTURA_VIRTUAL);
@@ -239,7 +226,6 @@ public class TelaTeste implements Screen {
 
         drawHUD();
 
-        // 3. Renderiza os itens e pedras secundárias
         pedraQueCai.render(camera);
         pedraEmpurravel.render(camera);
         for (Rubi rubi : listaRubis) {
