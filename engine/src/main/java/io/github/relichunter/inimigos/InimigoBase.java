@@ -65,11 +65,9 @@ public class InimigoBase {
                 caminhoTextura = "assets/inimigos/fire_spritesheet.png"; // Fogo Alto
                 totalFrames = 6;
                 this.larguraDesenho = 32f;
-                // MODIFICADO: Aumentei a altura de desenho para 64f (equivalente a 2 blocos de altura)
-                // Se quiser que ele fique ainda maior, basta mudar este valor para 80f ou 96f!
                 this.alturaDesenho = 64f;
                 break;
-            case 1:
+
             default:
                 caminhoTextura = "assets/inimigos/snake_spritesheet.png"; // Cobra
                 totalFrames = 4;
