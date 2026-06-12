@@ -23,7 +23,7 @@ public class InimigoBase {
         this.x = x;
         this.y = y;
         this.mapa = mapa;
-        this.spriteSheet = new Texture("snake_spritesheet.png");
+        this.spriteSheet = new Texture("assets/inimigos/snake_spritesheet.png");
         this.frames = new TextureRegion[7];
         for (int i = 0; i < 7; i++) frames[i] = new TextureRegion(spriteSheet, i * 32, 0, 32, 32);
         this.frameAtual = frames[0];

@@ -46,40 +46,60 @@ public class PedraEmpurravel {
             if (caixaPedra.overlaps(caixaPlayer)) {
                 String lado = calcularLadoColisao();
 
-                // 2. Aplicação do comportamento seguro com base no lado corrigido
-                // Subtraímos/somamos uma folga de segurança (ex: 2.1f) para compensar o alinhamento
-                // do sprite (normalmente maior) com a hitbox interna, prevenindo que fiquem colados.
                 switch (lado) {
                     case "ESQUERDA":
-                        direcao = 1; // Movimento para a direita
-                        estaRolando = true;
+                        // Só começa a rolar se o caminho à DIREITA no mapa estiver livre
+                        if (!colideComMapa(x + 5f, y)) {
+                            direcao = 1;
+                            estaRolando = true;
+                        } else {
+                            // Se tiver parede, barra o jogador impedindo clipping
+                            personagem.setX(x - personagem.getLargura() - 4.1f);
+                        }
                         break;
                     case "DIREITA":
-                        direcao = -1; // Movimento para a esquerda
-                        estaRolando = true;
+                        // Só começa a rolar se o caminho à ESQUERDA no mapa estiver livre
+                        if (!colideComMapa(x - 5f, y)) {
+                            direcao = -1;
+                            estaRolando = true;
+                        } else {
+                            // Se tiver parede, barra o jogador impedindo clipping
+                            personagem.setX(x + largura + 0.1f);
+                        }
                         break;
                     case "ACIMA":
-                        // Bloqueio superior limpo
                         personagem.setY(y + altura + 0.1f);
                         estaRolando = false;
                         break;
                     case "ABAIXO":
-                        // Bloqueio inferior compensando possíveis offsets do eixo Y
-                        personagem.setY(y - personagem.getAltura() - 2.1f);
+                        personagem.setY(y - personagem.getAltura() - 4.1f);
                         estaRolando = false;
                         break;
                 }
             }
         } else {
-            // Movimentação da pedra após o empurrão (Eixo X)
+            // Movimentação contínua da pedra
             float novoX = x + (direcao * velocidade * delta);
 
             if (colideComMapa(novoX, y)) {
                 estaRolando = false;
                 direcao = 0;
+
+                // Ajuste fino: Alinha a pedra perfeitamente ao grid do bloco quando parar
+                x = Math.round(x / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
+                caixaPedra.setX(x);
             } else {
                 x = novoX;
                 caixaPedra.setX(x);
+            }
+
+            // Mantém o player colado/empurrando a pedra enquanto ela se move de forma fluida
+            if (caixaPedra.overlaps(caixaPlayer)) {
+                if (direcao == 1) {
+                    personagem.setX(x - personagem.getLargura() - 4.1f);
+                } else if (direcao == -1) {
+                    personagem.setX(x + largura + 0.1f);
+                }
             }
         }
     }
@@ -101,7 +121,8 @@ public class PedraEmpurravel {
     }
 
     private boolean colideComMapa(float px, float py) {
-        Rectangle simulaPedra = new Rectangle(px, py, largura, altura);
+        // Reduzimos ligeiramente a caixa de teste para evitar falsos positivos nas quinas do corredor
+        Rectangle simulaPedra = new Rectangle(px + 1, py + 1, largura - 2, altura - 2);
         caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
 
         int larguraMapa = 60;

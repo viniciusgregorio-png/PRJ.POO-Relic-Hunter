@@ -13,7 +13,7 @@ public class MapaTeste {
     private TiledMapRenderer tiledMapRenderer;
 
     public MapaTeste() {
-        tiledMap = new TmxMapLoader().load("mapa.tmx");
+        tiledMap = new TmxMapLoader().load("assets/mapa/mapa.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 

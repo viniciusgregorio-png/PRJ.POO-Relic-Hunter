@@ -12,8 +12,11 @@ public class PedraQueCai extends Obstaculo {
     private boolean estaCaindo;
     private MapaTeste mapa;
     private int alturaVirtual;
+    private boolean pedraAtiva = true;
+    private float yLimite;
+    private boolean colidiuComPlayer = false;
 
-    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa, int alturaVirtual) {
+    public PedraQueCai(float x, float y, float largura, float altura, PersonagemTeste personagem, MapaTeste mapa, int alturaVirtual, float yLimite) {
         this.x = x;
         this.y = y;
         this.largura = largura;
@@ -23,22 +26,35 @@ public class PedraQueCai extends Obstaculo {
         this.shapeRenderer = new ShapeRenderer();
         this.mapa = mapa;
         this.alturaVirtual = alturaVirtual;
+        this.yLimite = yLimite;
     }
 
     @Override
     public void update(float delta) {
-        int colunaPedra = (int) (x / MapaTeste.TAMANHO_BLOCO);
-        int colunaPersonagem = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
-        if (colunaPedra == colunaPersonagem) {
-            estaCaindo = true;
+        if (!pedraAtiva) return;
+
+        if (!estaCaindo) {
+            int colunaPedra = (int) (x / MapaTeste.TAMANHO_BLOCO);
+            int colunaPersonagem = (int) (personagem.getPosX() / MapaTeste.TAMANHO_BLOCO);
+
+            if (colunaPedra == colunaPersonagem && personagem.getPosY() < y) {
+                estaCaindo = true;
+            }
         }
+
         if (estaCaindo) {
-            y -= 150 * delta;
+            y -= 300 * delta;
 
-            int coluna = (int) (x / MapaTeste.TAMANHO_BLOCO);
-            int linhaAbaixo = (int) ((alturaVirtual - y) / MapaTeste.TAMANHO_BLOCO);
+            if (x < personagem.getPosX() + personagem.getLargura() &&
+                x + largura > personagem.getPosX() &&
+                y < personagem.getPosY() + personagem.getAltura() &&
+                y + altura > personagem.getPosY()) {
+                personagem.morrer();
+                colidiuComPlayer = true; // (Mantendo o personagem.morrer())
+            }
 
-            if (!mapa.isEspacoLivre(coluna, linhaAbaixo)) {
+            if (y <= yLimite) {
+                pedraAtiva = false;
                 estaCaindo = false;
             }
         }
@@ -46,7 +62,9 @@ public class PedraQueCai extends Obstaculo {
 
     @Override
     public void render(OrthographicCamera camera) {
-        shapeRenderer.setProjectionMatrix(camera.combined); // ✅ usa a câmera
+        if (!pedraAtiva) return;
+
+        shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(x, y, largura, altura);
@@ -54,6 +72,12 @@ public class PedraQueCai extends Obstaculo {
     }
 
     public void dispose() {
-        shapeRenderer.dispose();
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+        }
+    }
+
+    public boolean isColidiuComPlayer() {
+        return colidiuComPlayer;
     }
 }

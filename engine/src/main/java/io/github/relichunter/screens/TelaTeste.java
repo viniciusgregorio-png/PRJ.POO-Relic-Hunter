@@ -1,11 +1,12 @@
 package io.github.relichunter.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
@@ -18,7 +19,7 @@ import io.github.relichunter.entidades.Bau;
 import io.github.relichunter.entidades.PedraEmpurravel;
 import io.github.relichunter.entidades.PedraQueCai;
 import io.github.relichunter.entidades.Rubi;
-import io.github.relichunter.inimigos.*;
+import io.github.relichunter.inimigos.InimigoBase;
 
 public class TelaTeste implements Screen {
 
@@ -27,10 +28,15 @@ public class TelaTeste implements Screen {
     private Texture resetButton;
     private MapaTeste mapa;
     private PersonagemTeste personaje;
+    private Music musicaGame;
 
-    private PedraQueCai pedraQueCai;
-    private PedraEmpurravel pedraEmpurravel;
+    private BitmapFont font;
+
+    // MODIFICADO: Agora usamos uma lista para armazenar todas as pedras que caem
+    private com.badlogic.gdx.utils.Array<PedraQueCai> listaPedrasQueCai;
     private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
+    private com.badlogic.gdx.utils.Array<PedraEmpurravel> listaPedrasEmpurraveis;
+
     private boolean jaLiberouNovosRubis = false;
     private Bau bau;
 
@@ -44,7 +50,7 @@ public class TelaTeste implements Screen {
     private final int LARGURA_VIRTUAL = 1200;
     private final int ALTURA_VIRTUAL = 900;
 
-    private static final float RESET_BUTTON_SIZE = 48f;
+    private static final float RESET_BUTTON_SIZE = 80f;
     private static final float RESET_BUTTON_X = 8f;
     private static final float RESET_BUTTON_Y = 268f;
 
@@ -54,17 +60,28 @@ public class TelaTeste implements Screen {
 
     @Override
     public void show() {
+
         batch = new SpriteBatch();
-        resetButton = new Texture("Png-Telas/resetGame.png");
+        resetButton = new Texture("assets/tela/resetGame.png");
         mapa = new MapaTeste();
         personaje = new PersonagemTeste();
+
+        musicaGame = Gdx.audio.newMusic(Gdx.files.internal("assets/musics/musicaTelaDoJogoCortado.mp3"));
+        musicaGame.setLooping(true);
+        musicaGame.setVolume(0.5f);
+        musicaGame.play();
+
+        font = new BitmapFont();
+        font.setColor(1, 1, 1, 1);
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
 
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
-
         listaInimigos = new com.badlogic.gdx.utils.Array<InimigoBase>();
+        listaPedrasEmpurraveis = new com.badlogic.gdx.utils.Array<PedraEmpurravel>();
+        // MODIFICADO: Inicializando a lista das pedras que caem
+        listaPedrasQueCai = new com.badlogic.gdx.utils.Array<PedraQueCai>();
 
         MapLayer camadaObjetos = mapa.getTiledMap().getLayers().get("objetos");
 
@@ -82,30 +99,22 @@ public class TelaTeste implements Screen {
                     personaje.setX(objX);
                     personaje.setY(objY);
                     objetosCarregadosDoTiled = true;
-                }
-                else if (nome.equalsIgnoreCase("snake_horizontal")) {
+                } else if (nome.equalsIgnoreCase("snake_horizontal")) {
                     listaInimigos.add(new InimigoBase(1, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-                }
-                else if (nome.equalsIgnoreCase("snake_vertical_meio")) {
+                } else if (nome.equalsIgnoreCase("snake_vertical_meio")) {
                     listaInimigos.add(new InimigoBase(3, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-                }
-                else if (nome.equalsIgnoreCase("snake_vertical_direita")) {
+                } else if (nome.equalsIgnoreCase("snake_vertical_direita")) {
                     listaInimigos.add(new InimigoBase(5, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
                 }
             }
         }
 
-        // SE NÃO CARREGOU DO TILED, CRIAR MANUALMENTE
         if (!objetosCarregadosDoTiled) {
             System.out.println("⚠️ Nenhum objeto carregado do Tiled! Usando posições padrão...");
 
-            // Posiçao padrão do jogador
             personaje.setX(30);
             personaje.setY(30);
 
-// Lista de 42 inimigos (sem uso de ciclos), organizados por tipo
-
-// Tipo 1: 11 unidades cobra fechada
             listaInimigos.add(new InimigoBase(1, 10, 100, 248f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(1, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(1, 10, 100, 642f, 339f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
@@ -118,20 +127,18 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(1, 10, 100, 397f, 509f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(1, 10, 100, 373f, 1218f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
 
-//* Tipo 2: 11 unidades morcego
-           listaInimigos.add(new InimigoBase(2, 10, 100, 206f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 864f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1027f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 285f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 253f, 1086f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 515f, 1152f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1276f, 867f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1526f, 813f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1827f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1429f, 331f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-           listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 206f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 864f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1027f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 285f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 253f, 1086f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 515f, 1152f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1276f, 867f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1526f, 813f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1827f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1429f, 331f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
 
-//* Tipo 3: 8 unidades aranha
             listaInimigos.add(new InimigoBase(3, 10, 100, 609f, 863f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(3, 10, 100, 189f, 934f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(3, 10, 100, 531f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
@@ -141,8 +148,6 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(3, 10, 100, 1091f, 1035f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
 
-
-//*Tipo 4: 11 unidades fogo
             listaInimigos.add(new InimigoBase(4, 10, 100, 1104f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(4, 10, 100, 1263f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(4, 10, 100, 1441f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
@@ -155,17 +160,46 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(4, 10, 100, 1666f, 765f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
             listaInimigos.add(new InimigoBase(4, 10, 100, 1123f, 1154f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
 
-            // Criar alguns rubis em posiçoes padrao
+            listaRubis.add(new Rubi(371.9883f, 508.9478f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1571.8608f, 350.97977f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1438.9127f, 483.84586f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1859.375f, 284.1942f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1859.9249f, 1083.5735f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(1088.3295f, 1109.3951f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(284.9394f, 867.3809f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(35.106544f, 1217.3754f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(514.6874f, 1127.4712f, 28.0F, 28.0F, personaje));
+            listaRubis.add(new Rubi(252.12126f, 1117.4712f, 28.0F, 28.0F, personaje));
             listaRubis.add(new Rubi(50f, 50f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(100f, 100f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(150f, 150f, 28.0F, 28.0F, personaje));
         }
 
         Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
-        bau = new Bau(352.0F, 64.0F, 28.0F, 28.0F, personaje, arrayParaOBau);
+        bau = new Bau(1800.0F, 200.0F, 80.0F, 50.0F, personaje, arrayParaOBau);
 
-        pedraQueCai = new PedraQueCai(1.0F, 320.0F, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL);
-        pedraEmpurravel = new PedraEmpurravel(129.0F, 129.0F, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL);
+
+        listaPedrasQueCai.add(new PedraQueCai(994.35f, 478.58f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 287.52f));
+        listaPedrasQueCai.add(new PedraQueCai(1218.65f, 887.79f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 668.12f));
+
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(479f, 159f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(449f, 192f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(129f, 130f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(733f, 224f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(925f, 161f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(746f, 95f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(676f, 32f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(353f, 516f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+
+    }
+
+    private void drawInfo() {
+        int rubisColetados = getTotalRubisColetados();
+        int rubisTotal = listaRubis.size;
+
+        batch.setProjectionMatrix(new com.badlogic.gdx.math.Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        batch.begin();
+        font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal, 50, Gdx.graphics.getHeight() - 50);
+        batch.end();
     }
 
     private void handleResetButton() {
@@ -181,6 +215,9 @@ public class TelaTeste implements Screen {
 
         if (touchPos.x >= hudX && touchPos.x <= hudX + RESET_BUTTON_SIZE &&
             touchPos.y >= hudY && touchPos.y <= hudY + RESET_BUTTON_SIZE) {
+            if (musicaGame != null) {
+                musicaGame.stop();
+            }
             game.setScreen(new TelaTeste(game));
         }
     }
@@ -206,10 +243,12 @@ public class TelaTeste implements Screen {
         float limiteSuperiorMapa = 40 * 32;
 
         if (camera.position.x < metadeLarguraCam) camera.position.x = metadeLarguraCam;
-        if (camera.position.x > limiteDireitoMapa - metadeLarguraCam) camera.position.x = limiteDireitoMapa - metadeLarguraCam;
+        if (camera.position.x > limiteDireitoMapa - metadeLarguraCam)
+            camera.position.x = limiteDireitoMapa - metadeLarguraCam;
 
         if (camera.position.y < metadeAlturaCam) camera.position.y = metadeAlturaCam;
-        if (camera.position.y > limiteSuperiorMapa - metadeAlturaCam) camera.position.y = limiteSuperiorMapa - metadeAlturaCam;
+        if (camera.position.y > limiteSuperiorMapa - metadeAlturaCam)
+            camera.position.y = limiteSuperiorMapa - metadeAlturaCam;
 
         camera.update();
     }
@@ -227,8 +266,19 @@ public class TelaTeste implements Screen {
 
         handleResetButton();
 
-        pedraQueCai.update(delta);
-        pedraEmpurravel.update(delta);
+        // MODIFICADO: Agora atualiza e verifica a colisão passando por TODAS as pedras da lista
+        for (PedraQueCai pedra : listaPedrasQueCai) {
+            pedra.update(delta);
+            if (pedra.isColidiuComPlayer()) {
+                musicaGame.stop();
+                game.setScreen(new GameOverScreen(game));
+                return;
+            }
+        }
+
+        for (PedraEmpurravel pedra : listaPedrasEmpurraveis) {
+            pedra.update(delta);
+        }
 
         for (Rubi rubi : listaRubis) {
             rubi.update(delta);
@@ -239,40 +289,45 @@ public class TelaTeste implements Screen {
             for (InimigoBase inimigo : listaInimigos) {
                 inimigo.update(delta);
 
-                // Se o inimigo atual encostar no player, Game Over
                 if (inimigo.encostouNoPlayer(personaje)) {
+                    musicaGame.stop();
                     game.setScreen(new GameOverScreen(game));
                     return;
                 }
             }
         }
 
-        // RENDERIZAR O MAPA COM A CÂMERA
         mapa.render(camera);
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         personaje.desenhar(batch, ALTURA_VIRTUAL);
 
-        //  DESENHAR TODOS OS INIMIGOS DA LISTA
         for (InimigoBase inimigo : listaInimigos) {
             inimigo.render(batch);
         }
 
         batch.end();
 
+        drawInfo();
         drawHUD();
 
-        pedraQueCai.render(camera);
-        pedraEmpurravel.render(camera);
+        // MODIFICADO: Agora renderiza todas as pedras vermelhas que estão no Array
+        for (PedraQueCai pedra : listaPedrasQueCai) {
+            pedra.render(camera);
+        }
+
+        for (PedraEmpurravel pedra : listaPedrasEmpurraveis) {
+            pedra.render(camera);
+        }
+
         for (Rubi rubi : listaRubis) {
             rubi.render(camera);
         }
         bau.render(camera);
 
-        // Descobrir a posição exata ao apertar a tecla P
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            System.out.println("📍 Posição do Personagem -> X: " + personaje.getPosX() + " | Y: " + personaje.getPosY());
+            System.out.println("Posição do Personagem -> X: " + personaje.getPosX() + " | Y: " + personaje.getPosY());
         }
     }
 
@@ -281,9 +336,17 @@ public class TelaTeste implements Screen {
         viewport.update(width, height);
     }
 
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
 
     @Override
     public void dispose() {
@@ -291,15 +354,24 @@ public class TelaTeste implements Screen {
         resetButton.dispose();
         mapa.dispose();
         personaje.dispose();
-        pedraQueCai.dispose();
-        pedraEmpurravel.dispose();
+
+        // MODIFICADO: Dá o dispose correto em cada uma das pedras da lista
+        for (PedraQueCai pedra : listaPedrasQueCai) {
+            pedra.dispose();
+        }
+
+        for (PedraEmpurravel pedra : listaPedrasEmpurraveis) {
+            pedra.dispose();
+        }
+
+        musicaGame.dispose();
+        font.dispose();
 
         for (Rubi rubi : listaRubis) {
             rubi.dispose();
         }
         bau.dispose();
 
-        // ✅ LIMPAR A MEMÓRIA DE TODOS OS INIMIGOS NA LISTA
         for (InimigoBase inimigo : listaInimigos) {
             inimigo.dispose();
         }

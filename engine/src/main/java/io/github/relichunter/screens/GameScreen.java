@@ -1,9 +1,7 @@
 package io.github.relichunter.screens;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.utils.Array;
 import io.github.relichunter.Main;
-import io.github.relichunter.inimigos.InimigoBase;
 
 public class GameScreen implements Screen {
     private static final int LARGURA_VIRTUAL = 480;

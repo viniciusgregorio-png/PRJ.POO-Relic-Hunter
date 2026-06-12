@@ -40,6 +40,11 @@ public class PersonagemTeste {
     private final float VELOCIDADE_ANIMACAO = 0.12f;
     private boolean estaSeMovendo = false;
 
+    public void morrer() {
+        this.posX = 100f;
+        this.posY = 100f;
+    }
+
     private enum DirecaoOlhando { FRENTE, COSTAS, LADO_BAIXO, LADO_CIMA }
     private DirecaoOlhando direcaoAtual = DirecaoOlhando.FRENTE;
     private boolean espelharX = false;
@@ -48,24 +53,21 @@ public class PersonagemTeste {
     private final Rectangle caixaBloco = new Rectangle();
 
     public PersonagemTeste() {
-        // 1. Carrega os arquivos de caminhada
-        texDown = new Texture("walk_Down.png");
-        texUp = new Texture("walk_Up.png");
-        texRightDown = new Texture("walk_Right_Down.png");
-        textureRightUp = new Texture("walk_Right_Up.png");
+        texDown = new Texture("assets/player/walk_Down.png");
+        texUp = new Texture("assets/player/walk_Up.png");
+        texRightDown = new Texture("assets/player/walk_Right_Down.png");
+        textureRightUp = new Texture("assets/player/walk_Right_Up.png");
 
-        texIdleDown = new Texture("idle_Down.png");
-        texIdleUp = new Texture("idle_Up.png");
-        texIdleRightDown = new Texture("idle_Right_Down.png");
-        texIdleRightUp = new Texture("idle_Right_Up.png");
+        texIdleDown = new Texture("assets/player/idle_Down.png");
+        texIdleUp = new Texture("assets/player/idle_Up.png");
+        texIdleRightDown = new Texture("assets/player/idle_Right_Down.png");
+        texIdleRightUp = new Texture("assets/player/idle_Right_Up.png");
 
-        // 3. Recorta as tiras de caminhada dinamicamente (8 frames por linha)
         framesDown = TextureRegion.split(texDown, texDown.getWidth() / 8, texDown.getHeight())[0];
         framesUp = TextureRegion.split(texUp, texUp.getWidth() / 8, texUp.getHeight())[0];
         framesRightDown = TextureRegion.split(texRightDown, texRightDown.getWidth() / 8, texRightDown.getHeight())[0];
         framesRightUp = TextureRegion.split(textureRightUp, textureRightUp.getWidth() / 8, textureRightUp.getHeight())[0];
 
-        // 4. Recorta as tiras de Idle (Supondo que também tenham 8 frames ou mude o divisor se tiver menos)
         framesIdleDown = TextureRegion.split(texIdleDown, texIdleDown.getWidth() / 8, texIdleDown.getHeight())[0];
         framesIdleUp = TextureRegion.split(texIdleUp, texIdleUp.getWidth() / 8, texIdleUp.getHeight())[0];
         framesIdleRightDown = TextureRegion.split(texIdleRightDown, texIdleRightDown.getWidth() / 8, texIdleRightDown.getHeight())[0];
@@ -142,7 +144,6 @@ public class PersonagemTeste {
             }
         }
 
-        // 5. CRIAÇÃO DA REGIÃO E APLICAÇÃO DO FLIP
         frameAtual = new TextureRegion(frameSelecionado);
         if (espelharX) {
             frameAtual.flip(true, false);
@@ -152,6 +153,9 @@ public class PersonagemTeste {
     }
 
     private boolean detectarColisao(float proximaX, float proximaY, MapaTeste mapa) {
+        // Guarda a posição atual antes do teste para analisar se estamos saindo de um bug
+        Rectangle caixaAtual = new Rectangle(posX + 4, posY + 4, caixaPersonagem.width, caixaPersonagem.height);
+
         caixaPersonagem.setPosition(proximaX + 4, proximaY + 4);
         caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
 
@@ -172,6 +176,21 @@ public class PersonagemTeste {
                     caixaBloco.setPosition(xPixelBloco, yPixelBloco);
 
                     if (caixaPersonagem.overlaps(caixaBloco)) {
+                        // SISTEMA ANTI-TRAVAMENTO: Se o personagem JÁ ESTAVA dentro da parede
+                        if (caixaAtual.overlaps(caixaBloco)) {
+                            // Calcula as sobreposições atual e nova
+                            float overlapAtualX = Math.min(caixaAtual.x + caixaAtual.width, caixaBloco.x + caixaBloco.width) - Math.max(caixaAtual.x, caixaBloco.x);
+                            float overlapAtualY = Math.min(caixaAtual.y + caixaAtual.height, caixaBloco.y + caixaBloco.height) - Math.max(caixaAtual.y, caixaBloco.y);
+
+                            float overlapNovoX = Math.min(caixaPersonagem.x + caixaPersonagem.width, caixaBloco.x + caixaBloco.width) - Math.max(caixaPersonagem.x, caixaBloco.x);
+                            float overlapNovoY = Math.min(caixaPersonagem.y + caixaPersonagem.height, caixaBloco.y + caixaBloco.height) - Math.max(caixaPersonagem.y, caixaBloco.y);
+
+                            // Se o novo movimento diminui a sobreposição total, significa que estamos SAINDO da parede. Permite andar!
+                            if ((overlapNovoX + overlapNovoY) < (overlapAtualX + overlapAtualY)) {
+                                continue;
+                            }
+                        }
+
                         caixaPersonagem.setPosition(posX + 4, posY + 4);
                         return true;
                     }
@@ -187,7 +206,6 @@ public class PersonagemTeste {
         float larguraOriginal = frameAtual.getRegionWidth();
         float alturaOriginal = frameAtual.getRegionHeight();
 
-        // Preservando as proporções exatas do ajuste fino que fizemos por último
         float escalaX = 1.3f;
         float escalaY = 1.05f;
 

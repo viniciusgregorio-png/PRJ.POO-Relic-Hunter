@@ -30,8 +30,8 @@ public class EndGameScreen implements Screen {
 
         batch = new SpriteBatch();
 
-        background = new Texture("endGame.png");
-        star = new Texture("star.png");
+        background = new Texture("assets/tela/endGame.png");
+        star = new Texture("assets/tela/star.png");
 
         earnedStars = calculateStars(totalRubisColetados);
     }

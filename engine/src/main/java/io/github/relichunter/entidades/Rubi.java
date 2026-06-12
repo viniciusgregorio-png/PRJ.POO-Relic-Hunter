@@ -24,7 +24,7 @@ public class Rubi extends Item {
         this.foiColetado = false;
         this.personagem = personagem;
         this.spriteBatch = new SpriteBatch();
-        this.spriteSheet = new Texture("Crystals.png");
+        this.spriteSheet = new Texture("assets/mapa/Crystals.png");
         this.cristalRoxo = new TextureRegion(spriteSheet, 32, 0, 32, 32);
     }
 

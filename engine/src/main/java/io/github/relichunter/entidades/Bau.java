@@ -33,11 +33,11 @@ public class Bau extends Item {
         this.caixaBau = new Rectangle();
 
         this.spriteBatch = new SpriteBatch();
-        this.spriteSheet = new Texture("chests_byBatuhanK.png");
+        this.spriteSheet = new Texture("assets/mapa/chests_byBatuhanK.png");
+        System.out.println("Texture do Bau carregada");
 
-        this.bauFechado = new TextureRegion(spriteSheet, 64, 0, 32, 32);
-        this.bauAberto  = new TextureRegion(spriteSheet, 64, 32, 32, 32);
-
+        this.bauFechado = new TextureRegion(spriteSheet, 0, 0, 40, 16);
+        this.bauAberto  = new TextureRegion(spriteSheet, 40, 0, 40, 16);
         this.frameAtual = bauFechado;
     }
 
@@ -52,7 +52,7 @@ public class Bau extends Item {
             }
         }
 
-        if (rubisColetados == 3){
+        if (rubisColetados == 1){
             estaVisivel = true;
         }
 

@@ -24,7 +24,7 @@ public class GameOverScreen implements Screen {
 
         batch = new SpriteBatch();
 
-        background = new Texture("gameOver.png");
+        background = new Texture("assets/tela/gameOver.png");
     }
 
     @Override
