@@ -26,13 +26,12 @@ public class SplashScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        logo  = new Texture("logoRelic.png");
+        logo = new Texture("Png-Telas/logoRelic.png");
         font  = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(2f);
 
-        musica = Gdx.audio.newMusic(Gdx.files.internal("assets/musics/audioInicialTopGear.mp3"));
-        musica.setLooping(true);
+        musica = Gdx.audio.newMusic(Gdx.files.internal("musics/audioInicialTopGear.mp3"));        musica.setLooping(true);
         musica.setVolume(1.0f);
         musica.play();
     }

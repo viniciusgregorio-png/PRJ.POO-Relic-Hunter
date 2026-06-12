@@ -55,7 +55,7 @@ public class TelaTeste implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        resetButton = new Texture("resetGame.png");
+        resetButton = new Texture("Png-Telas/resetGame.png");
         mapa = new MapaTeste();
         personaje = new PersonagemTeste();
 
@@ -64,10 +64,8 @@ public class TelaTeste implements Screen {
 
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
 
-        // ✅ INICIALIZANDO A LISTA DE INIMIGOS
         listaInimigos = new com.badlogic.gdx.utils.Array<InimigoBase>();
 
-        // TENTAR CARREGAR DO TILED PRIMEIRO
         MapLayer camadaObjetos = mapa.getTiledMap().getLayers().get("objetos");
 
         boolean objetosCarregadosDoTiled = false;
@@ -237,7 +235,6 @@ public class TelaTeste implements Screen {
         }
         bau.update(delta);
 
-        // ✅ ATUALIZAR TODOS OS INIMIGOS DA LISTA E CHECAR COLISÃO
         if (inimigosAtivos) {
             for (InimigoBase inimigo : listaInimigos) {
                 inimigo.update(delta);
@@ -257,7 +254,7 @@ public class TelaTeste implements Screen {
         batch.begin();
         personaje.desenhar(batch, ALTURA_VIRTUAL);
 
-        // ✅ DESENHAR TODOS OS INIMIGOS DA LISTA
+        //  DESENHAR TODOS OS INIMIGOS DA LISTA
         for (InimigoBase inimigo : listaInimigos) {
             inimigo.render(batch);
         }
