@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.relichunter.Main;
 import io.github.relichunter.entidades.Bau;
@@ -49,9 +50,9 @@ public class TelaTeste implements Screen {
     private final int LARGURA_VIRTUAL = 1200;
     private final int ALTURA_VIRTUAL = 900;
 
-    private static final float RESET_BUTTON_SIZE = 80f;
-    private static final float RESET_BUTTON_X = 8f;
-    private static final float RESET_BUTTON_Y = 268f;
+    private static final float RESET_BUTTON_SIZE = 120f;
+    private static final float RESET_BUTTON_X = 32f;
+    private static final float RESET_BUTTON_Y = 50f;
 
     public TelaTeste(Main game) {
         this.game = game;
@@ -74,7 +75,7 @@ public class TelaTeste implements Screen {
         font.setColor(1, 1, 1, 1);
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
+        viewport = new StretchViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
 
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
         listaInimigos = new com.badlogic.gdx.utils.Array<InimigoBase>();
@@ -216,35 +217,35 @@ public class TelaTeste implements Screen {
         int rubisColetados = getTotalRubisColetados();
         int rubisTotal = listaRubis.size;
 
-        batch.setProjectionMatrix(new com.badlogic.gdx.math.Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal, 50, Gdx.graphics.getHeight() - 50);
+        font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal,
+            camera.position.x - viewport.getWorldWidth() / 2f + 50,
+            camera.position.y + viewport.getWorldHeight() / 2f - 50
+        );
         batch.end();
     }
 
     private void handleResetButton() {
-        if (!Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            return;
-        }
+        if (!Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) return;
 
-        Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        viewport.unproject(touchPos);
+        Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        viewport.unproject(mouse);
 
-        float hudX = camera.position.x - viewport.getWorldWidth() / 2f + RESET_BUTTON_X;
-        float hudY = camera.position.y - viewport.getWorldHeight() / 2f + RESET_BUTTON_Y;
+        float hudX = RESET_BUTTON_X;
+        float hudY = viewport.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
 
-        if (touchPos.x >= hudX && touchPos.x <= hudX + RESET_BUTTON_SIZE &&
-            touchPos.y >= hudY && touchPos.y <= hudY + RESET_BUTTON_SIZE) {
-            if (musicaGame != null) {
-                musicaGame.stop();
-            }
+        if (mouse.x >= hudX && mouse.x <= hudX + RESET_BUTTON_SIZE &&
+            mouse.y >= hudY && mouse.y <= hudY + RESET_BUTTON_SIZE) {
+
+            if (musicaGame != null) musicaGame.stop();
             game.setScreen(new TelaTeste(game));
         }
     }
 
     private void drawHUD() {
-        float hudX = camera.position.x - viewport.getWorldWidth() / 2f + RESET_BUTTON_X;
-        float hudY = camera.position.y - viewport.getWorldHeight() / 2f + RESET_BUTTON_Y;
+        float hudX = RESET_BUTTON_X;
+        float hudY = viewport.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -276,6 +277,8 @@ public class TelaTeste implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15F, 0.15F, 0.15F, 1.0F);
+
+        viewport.apply();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
             inimigosAtivos = !inimigosAtivos;
