@@ -1,6 +1,5 @@
 1_Mine_Tileset_1.png
 Crystals.png
-audioInicialTopGear.mp3
 chao.png
 chests_byBatuhanK.png
 endGame.png
@@ -15,6 +14,8 @@ idle_Up.png
 inimigo.png
 logoRelic.png
 mapa.tmx
+musics/audioInicialTopGear.mp3
+musics/musicaTelaDoJogoCortado.mp3
 parede.png
 resetGame.png
 snake_spritesheet.png

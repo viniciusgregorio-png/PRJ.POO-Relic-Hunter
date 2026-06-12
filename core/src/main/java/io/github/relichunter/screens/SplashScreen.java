@@ -31,7 +31,7 @@ public class SplashScreen implements Screen {
         font.setColor(Color.WHITE);
         font.getData().setScale(2f);
 
-        musica = Gdx.audio.newMusic(Gdx.files.internal("audioInicialTopGear.mp3"));
+        musica = Gdx.audio.newMusic(Gdx.files.internal("assets/musics/audioInicialTopGear.mp3"));
         musica.setLooping(true);
         musica.setVolume(1.0f);
         musica.play();

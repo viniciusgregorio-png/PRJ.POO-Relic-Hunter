@@ -35,7 +35,7 @@ public class PersonagemTeste {
     private float posX;
     private float posY;
 
-    private final float VELOCIDADE = 100f;
+    private final float VELOCIDADE = 250f;
     private float tempoAnimacao = 0;
     private final float VELOCIDADE_ANIMACAO = 0.12f;
     private boolean estaSeMovendo = false;

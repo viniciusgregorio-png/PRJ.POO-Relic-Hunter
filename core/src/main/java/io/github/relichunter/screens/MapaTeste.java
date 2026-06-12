@@ -1,52 +1,48 @@
 package io.github.relichunter.screens;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 public class MapaTeste {
-    private TiledMap tiledMap;
-    private OrthogonalTiledMapRenderer mapaRenderer;
-    private TiledMapTileLayer camadaColisao;
-
     public static final int TAMANHO_BLOCO = 32;
+    private TiledMap tiledMap;
+    private TiledMapRenderer tiledMapRenderer;
 
     public MapaTeste() {
-        this.tiledMap = new TmxMapLoader().load("mapa.tmx");
-        this.mapaRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
-        this.camadaColisao = (TiledMapTileLayer) tiledMap.getLayers().get("paredes");
+        tiledMap = new TmxMapLoader().load("mapa.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 
     public void render(OrthographicCamera camera) {
-        mapaRenderer.setView(camera);
-        mapaRenderer.render();
+        tiledMapRenderer.setView(camera);
+        tiledMapRenderer.render();
     }
 
-    public boolean isEspacoLivre(int coluna, int javaLinha) {
-        if (camadaColisao == null) return true;
+    public boolean isParede(float x, float y) {
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("paredes");
+        if (layer == null) return false;
+        int tileX = (int) (x / TAMANHO_BLOCO);
+        int tileY = (int) (y / TAMANHO_BLOCO);
+        return layer.getCell(tileX, tileY) != null;
+    }
 
-        if (coluna < 0 || coluna >= camadaColisao.getWidth() || javaLinha < 0 || javaLinha >= camadaColisao.getHeight()) {
-            return false;
-        }
-
-        TiledMapTileLayer.Cell celula = camadaColisao.getCell(coluna, javaLinha);
-
-        return celula == null;
+    public boolean isEspacoLivre(int tileX, int tileY) {
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("paredes");
+        return layer == null || layer.getCell(tileX, tileY) == null;
     }
 
     public int getQuantidadeLinhas() {
-        return camadaColisao != null ? camadaColisao.getHeight() : 40;
+        return tiledMap.getProperties().get("height", Integer.class);
     }
 
-    public TiledMap getTiledMap() {
-        return tiledMap;
+    public int getQuantidadeColunas() {
+        return tiledMap.getProperties().get("width", Integer.class);
     }
 
-    public void dispose() {
-        tiledMap.dispose();
-        mapaRenderer.dispose();
-    }
+    public TiledMap getTiledMap() { return tiledMap; }
+    public void dispose() { tiledMap.dispose(); }
 }
