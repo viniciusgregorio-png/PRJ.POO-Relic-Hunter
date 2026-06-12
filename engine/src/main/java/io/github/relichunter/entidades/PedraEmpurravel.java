@@ -7,32 +7,52 @@ import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
 public class PedraEmpurravel {
-    private float x, y;
-    private float largura, altura;
-    private float velocidade = 150f;
-    private int direcao = 0; // -1 Esquerda, 1 Direita, 0 Parada
-    private boolean estaRolando = false;
 
-    private MapaTeste mapa;
-    private PersonagemTeste personagem;
-    private float alturaVirtual;
+    // Enumeração para controlar de forma limpa as ações da Pedra (Máquina de Estados)
+    private enum Estado {
+        PARADA,
+        EMPURRADA, // Movimento horizontal de exatamente 1 bloco
+        CAINDO     // Movimento vertical (gravidade) até encontrar o chão
+    }
+
+    private float x, y;
+    private final float largura, altura;
+
+    // Ajuste de velocidades
+    private final float VELOCIDADE_EMPURRAO = 150f;
+    private final float VELOCIDADE_QUEDA = 300f;
+
+    private int direcaoX = 0; // -1 Esquerda, 1 Direita, 0 Parada
+    private Estado estadoAtual = Estado.PARADA;
+
+    // Coordenadas que servem de destino (Grid-Lock)
+    private float xAlvo;
+    private float yAlvo;
+
+    private final MapaTeste mapa;
+    private final PersonagemTeste personagem;
+    private final float alturaVirtual;
 
     private final Rectangle caixaPedra = new Rectangle();
     private final Rectangle caixaPlayer = new Rectangle();
-    private final Rectangle caixaBloco = new Rectangle();
     private final ShapeRenderer shapeRenderer;
 
     public PedraEmpurravel(float x, float y, float largura, float altura, MapaTeste mapa, PersonagemTeste personagem, float alturaVirtual) {
-        this.x = x;
-        this.y = y;
+        // Alinha a pedra perfeitamente ao Grid de 32x32 do mapa logo no spawn
+        this.x = Math.round(x / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
+        this.y = Math.round(y / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
+
         this.largura = largura;
         this.altura = altura;
         this.mapa = mapa;
         this.personagem = FitsPersonagem(personagem);
         this.alturaVirtual = alturaVirtual;
 
-        this.caixaPedra.set(x, y, largura, altura);
+        this.caixaPedra.set(this.x, this.y, largura, altura);
         this.shapeRenderer = new ShapeRenderer();
+
+        this.xAlvo = this.x;
+        this.yAlvo = this.y;
     }
 
     private PersonagemTeste FitsPersonagem(PersonagemTeste p) {
@@ -40,70 +60,183 @@ public class PedraEmpurravel {
     }
 
     public void update(float delta) {
+        // Atualiza a referência da caixa do jogador
         caixaPlayer.set(personagem.getCaixaPersonagem());
 
-        if (!estaRolando) {
-            if (caixaPedra.overlaps(caixaPlayer)) {
-                String lado = calcularLadoColisao();
-
-                switch (lado) {
-                    case "ESQUERDA":
-                        // Só começa a rolar se o caminho à DIREITA no mapa estiver livre
-                        if (!colideComMapa(x + 5f, y)) {
-                            direcao = 1;
-                            estaRolando = true;
-                        } else {
-                            // Se tiver parede, barra o jogador impedindo clipping
-                            personagem.setX(x - personagem.getLargura() - 4.1f);
-                        }
-                        break;
-                    case "DIREITA":
-                        // Só começa a rolar se o caminho à ESQUERDA no mapa estiver livre
-                        if (!colideComMapa(x - 5f, y)) {
-                            direcao = -1;
-                            estaRolando = true;
-                        } else {
-                            // Se tiver parede, barra o jogador impedindo clipping
-                            personagem.setX(x + largura + 0.1f);
-                        }
-                        break;
-                    case "ACIMA":
-                        personagem.setY(y + altura + 0.1f);
-                        estaRolando = false;
-                        break;
-                    case "ABAIXO":
-                        personagem.setY(y - personagem.getAltura() - 4.1f);
-                        estaRolando = false;
-                        break;
+        switch (estadoAtual) {
+            case PARADA:
+                // Se está imóvel, primeiro verifica se há solo firme abaixo
+                if (verificarAbaixoLivre()) {
+                    iniciarQueda();
+                } else {
+                    // Se estiver no chão firme, aceita empurrões do jogador
+                    checarInteracaoJogador();
                 }
-            }
-        } else {
-            // Movimentação contínua da pedra
-            float novoX = x + (direcao * velocidade * delta);
+                break;
 
-            if (colideComMapa(novoX, y)) {
-                estaRolando = false;
-                direcao = 0;
+            case EMPURRADA:
+                atualizarEmpurrao(delta);
+                break;
 
-                // Ajuste fino: Alinha a pedra perfeitamente ao grid do bloco quando parar
-                x = Math.round(x / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
-                caixaPedra.setX(x);
-            } else {
-                x = novoX;
-                caixaPedra.setX(x);
-            }
+            case CAINDO:
+                atualizarQueda(delta);
+                break;
+        }
 
-            // Mantém o player colado/empurrando a pedra enquanto ela se move de forma fluida
-            if (caixaPedra.overlaps(caixaPlayer)) {
-                if (direcao == 1) {
-                    personagem.setX(x - personagem.getLargura() - 4.1f);
-                } else if (direcao == -1) {
-                    personagem.setX(x + largura + 0.1f);
-                }
+        // Mantém a hitbox da pedra perfeitamente emparelhada com as coordenadas visuais
+        caixaPedra.setPosition(x, y);
+    }
+
+    /**
+     * Gerencia a aproximação e colisão física estática do jogador contra a pedra.
+     */
+    private void checarInteracaoJogador() {
+        if (caixaPedra.overlaps(caixaPlayer)) {
+            String lado = calcularLadoColisao();
+
+            switch (lado) {
+                case "ESQUERDA":
+                    // Jogador empurrando para a DIREITA
+                    float alvoDireita = x + MapaTeste.TAMANHO_BLOCO;
+                    if (!colideComMapa(alvoDireita, y)) {
+                        xAlvo = alvoDireita;
+                        direcaoX = 1;
+                        estadoAtual = Estado.EMPURRADA;
+                    } else {
+                        // Se houver parede atrás da pedra, ela barra o jogador (colisão sólida)
+                        bloquearJogadorEsquerda();
+                    }
+                    break;
+
+                case "DIREITA":
+                    // Jogador empurrando para a ESQUERDA
+                    float alvoEsquerda = x - MapaTeste.TAMANHO_BLOCO;
+                    if (!colideComMapa(alvoEsquerda, y)) {
+                        xAlvo = alvoEsquerda;
+                        direcaoX = -1;
+                        estadoAtual = Estado.EMPURRADA;
+                    } else {
+                        // Se houver parede atrás da pedra, ela barra o jogador (colisão sólida)
+                        bloquearJogadorDireita();
+                    }
+                    break;
+
+                case "ACIMA":
+                    // Jogador caminhando em cima da pedra (atua como plataforma sólida)
+                    personagem.setY(y + altura - 3.9f);
+                    break;
+
+                case "ABAIXO":
+                    // Jogador cabeceando a pedra por baixo
+                    personagem.setY(y - personagem.getAltura() - 4.1f);
+                    break;
             }
         }
     }
 
+    /**
+     * Executa o deslocamento lateral e para de forma precisa no próximo slot de bloco.
+     */
+    private void atualizarEmpurrao(float delta) {
+        float passo = direcaoX * VELOCIDADE_EMPURRAO * delta;
+        x += passo;
+
+        // Verifica se ultrapassou ou chegou na posição alvo do grid
+        if ((direcaoX == 1 && x >= xAlvo) || (direcaoX == -1 && x <= xAlvo)) {
+            x = xAlvo;
+            estadoAtual = Estado.PARADA;
+            direcaoX = 0;
+        }
+
+        // Mantém o jogador empurrando visualmente colado à pedra
+        if (caixaPedra.overlaps(caixaPlayer)) {
+            if (direcaoX == 1) {
+                bloquearJogadorEsquerda();
+            } else if (direcaoX == -1) {
+                bloquearJogadorDireita();
+            }
+        }
+    }
+
+    /**
+     * Inicia a queda vertical calculando a altura alvo.
+     */
+    private void iniciarQueda() {
+        yAlvo = y - MapaTeste.TAMANHO_BLOCO;
+        estadoAtual = Estado.CAINDO;
+    }
+
+    /**
+     * Move a pedra para baixo sob gravidade e checa mortes por esmagamento.
+     */
+    private void atualizarQueda(float delta) {
+        y -= VELOCIDADE_QUEDA * delta;
+        caixaPedra.setPosition(x, y); // Atualiza temporariamente para o cálculo preciso de colisão
+
+        // VERIFICAÇÃO DE COLLISÃO DURANTE A QUEDA:
+        if (caixaPedra.overlaps(caixaPlayer)) {
+            // Calcula as caixas de colisão de forma precisa e isolada
+            float playerEsquerda = caixaPlayer.x;
+            float playerDireita = caixaPlayer.x + caixaPlayer.width;
+            float playerTopo = caixaPlayer.y + caixaPlayer.height;
+
+            float pedraEsquerda = x;
+            float pedraDireita = x + largura;
+            float pedraBase = y;
+
+            // 1. Só há esmagamento real se a base da pedra estiver acima do "meio" do jogador
+            // e se o jogador estiver significativamente alinhado abaixo da pedra (com tolerância de 6 pixels)
+            float margemX = 6f;
+            boolean estaAlinhadoX = (playerDireita - margemX > pedraEsquerda) && (playerEsquerda + margemX < pedraDireita);
+            boolean estaAbaixoDaPedra = playerTopo > pedraBase && caixaPlayer.y < pedraBase;
+
+            if (estaAlinhadoX && estaAbaixoDaPedra) {
+                // Esmagamento real! O jogador estava exatamente por baixo
+                personagem.morrer();
+            } else {
+                // Colisão estritamente lateral enquanto a pedra cai (evita clipping e mortes injustas)
+                float centroPedraX = x + largura / 2f;
+                float centroPlayerX = caixaPlayer.x + caixaPlayer.width / 2f;
+
+                if (centroPlayerX < centroPedraX) {
+                    // Jogador está na esquerda da pedra, empurra-o ligeiramente para trás
+                    bloquearJogadorEsquerda();
+                } else {
+                    // Jogador está na direita da pedra, empurra-o ligeiramente para a direita
+                    bloquearJogadorDireita();
+                }
+            }
+        }
+
+        // Se alcançou ou passou da altura alvo
+        if (y <= yAlvo) {
+            y = yAlvo;
+            estadoAtual = Estado.PARADA; // Volta a ficar parada para verificar se cai mais ou se estabelece
+        }
+    }
+
+    /**
+     * Verifica se o espaço abaixo do bloco está livre de paredes no mapa.
+     */
+    private boolean verificarAbaixoLivre() {
+        float yAbaixo = y - MapaTeste.TAMANHO_BLOCO;
+        return !colideComMapa(x, yAbaixo);
+    }
+
+    /**
+     * Bloqueios físicos milimetricamente calculados de acordo com os offsets do seu PersonagemTeste
+     */
+    private void bloquearJogadorEsquerda() {
+        personagem.setX(x - personagem.getLargura() - 4.1f);
+    }
+
+    private void bloquearJogadorDireita() {
+        personagem.setX(x + largura - 3.9f);
+    }
+
+    /**
+     * Define de qual direção o jogador encostou na pedra.
+     */
     private String calcularLadoColisao() {
         float centroPedraX = x + largura / 2f;
         float centroPedraY = y + altura / 2f;
@@ -120,22 +253,34 @@ public class PedraEmpurravel {
         }
     }
 
+    /**
+     * Sistema de Colisão Otimizado (Tile-Based).
+     */
     private boolean colideComMapa(float px, float py) {
-        // Reduzimos ligeiramente a caixa de teste para evitar falsos positivos nas quinas do corredor
-        Rectangle simulaPedra = new Rectangle(px + 1, py + 1, largura - 2, altura - 2);
-        caixaBloco.setSize(MapaTeste.TAMANHO_BLOCO, MapaTeste.TAMANHO_BLOCO);
+        float margem = 1f;
+        float x1 = px + margem;
+        float y1 = py + margem;
+        float x2 = px + largura - margem;
+        float y2 = py + altura - margem;
 
-        int larguraMapa = 60;
-        for (int linha = 0; linha < mapa.getQuantidadeLinhas(); linha++) {
-            for (int coluna = 0; coluna < larguraMapa; coluna++) {
+        // Converte as extremidades da caixa da pedra em coordenadas de Tile
+        int tileX1 = (int) (x1 / MapaTeste.TAMANHO_BLOCO);
+        int tileY1 = (int) (y1 / MapaTeste.TAMANHO_BLOCO);
+        int tileX2 = (int) (x2 / MapaTeste.TAMANHO_BLOCO);
+        int tileY2 = (int) (y2 / MapaTeste.TAMANHO_BLOCO);
+
+        int larguraMapa = mapa.getQuantidadeColunas();
+        int alturaMapa = mapa.getQuantidadeLinhas();
+
+        // Varre apenas os blocos que a pedra ocupa fisicamente no momento
+        for (int linha = tileY1; linha <= tileY2; linha++) {
+            for (int coluna = tileX1; coluna <= tileX2; coluna++) {
+                // Proteção contra leitura fora dos limites do mapa (considerado parede)
+                if (coluna < 0 || coluna >= larguraMapa || linha < 0 || linha >= alturaMapa) {
+                    return true;
+                }
                 if (!mapa.isEspacoLivre(coluna, linha)) {
-                    int bx = coluna * MapaTeste.TAMANHO_BLOCO;
-                    int by = linha * MapaTeste.TAMANHO_BLOCO;
-                    caixaBloco.setPosition(bx, by);
-
-                    if (simulaPedra.overlaps(caixaBloco)) {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
@@ -145,7 +290,7 @@ public class PedraEmpurravel {
     public void render(OrthographicCamera camera) {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0.9f, 0.5f, 0.0f, 1.0f); // Laranja para testes
+        shapeRenderer.setColor(0.9f, 0.5f, 0.0f, 1.0f); // Cor Laranja de Teste
         shapeRenderer.rect(x, y, largura, altura);
         shapeRenderer.end();
     }

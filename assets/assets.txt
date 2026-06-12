@@ -1,4 +1,7 @@
+inimigos/bat_spritesheet.png
+inimigos/fire_spritesheet.png
 inimigos/snake_spritesheet.png
+inimigos/spider_spritesheet.png
 mapa/1_Mine_Tileset_1.png
 mapa/Crystals.png
 mapa/bau.png

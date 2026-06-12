@@ -32,7 +32,6 @@ public class TelaTeste implements Screen {
 
     private BitmapFont font;
 
-    // MODIFICADO: Agora usamos uma lista para armazenar todas as pedras que caem
     private com.badlogic.gdx.utils.Array<PedraQueCai> listaPedrasQueCai;
     private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
     private com.badlogic.gdx.utils.Array<PedraEmpurravel> listaPedrasEmpurraveis;
@@ -80,7 +79,6 @@ public class TelaTeste implements Screen {
         listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
         listaInimigos = new com.badlogic.gdx.utils.Array<InimigoBase>();
         listaPedrasEmpurraveis = new com.badlogic.gdx.utils.Array<PedraEmpurravel>();
-        // MODIFICADO: Inicializando a lista das pedras que caem
         listaPedrasQueCai = new com.badlogic.gdx.utils.Array<PedraQueCai>();
 
         MapLayer camadaObjetos = mapa.getTiledMap().getLayers().get("objetos");
@@ -100,11 +98,17 @@ public class TelaTeste implements Screen {
                     personaje.setY(objY);
                     objetosCarregadosDoTiled = true;
                 } else if (nome.equalsIgnoreCase("snake_horizontal")) {
-                    listaInimigos.add(new InimigoBase(1, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+                    // Tipo 1: Configurado com movimento 1 (Horizontal)
+                    listaInimigos.add(new InimigoBase(1, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
                 } else if (nome.equalsIgnoreCase("snake_vertical_meio")) {
-                    listaInimigos.add(new InimigoBase(3, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+                    // Tipo 3: Configurado agora com movimento 0 (Parado)
+                    listaInimigos.add(new InimigoBase(3, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
                 } else if (nome.equalsIgnoreCase("snake_vertical_direita")) {
-                    listaInimigos.add(new InimigoBase(5, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+                    // Tipo 5: Mantido com movimento 2 (Vertical)
+                    listaInimigos.add(new InimigoBase(5, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+                } else if (nome.equalsIgnoreCase("snake_parada")) {
+                    // Tipo 4: Configurado com movimento 0 (Parado)
+                    listaInimigos.add(new InimigoBase(4, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
                 }
             }
         }
@@ -115,50 +119,54 @@ public class TelaTeste implements Screen {
             personaje.setX(30);
             personaje.setY(30);
 
-            listaInimigos.add(new InimigoBase(1, 10, 100, 248f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 642f, 339f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 1073f, 284f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 1506f, 927f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 409f, 700f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 576f, 990f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 992f, 585f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 1395f, 670f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 397f, 509f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 373f, 1218f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            // Inimigos Horizontais (Tipo 1 -> movimento 1)
+            listaInimigos.add(new InimigoBase(1, 10, 100, 248f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 642f, 339f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 1073f, 284f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 1506f, 927f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 409f, 700f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 576f, 990f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 992f, 585f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 1395f, 670f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 397f, 509f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
+            listaInimigos.add(new InimigoBase(1, 10, 100, 373f, 1218f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
 
-            listaInimigos.add(new InimigoBase(2, 10, 100, 206f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 864f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1027f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 285f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 253f, 1086f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 515f, 1152f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1276f, 867f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1526f, 813f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1827f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1429f, 331f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            // Inimigos Verticais (Tipo 2 -> movimento 2)
+            listaInimigos.add(new InimigoBase(2, 10, 100, 206f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 864f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1027f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 285f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 253f, 1086f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 515f, 1152f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1276f, 867f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1526f, 813f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1827f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1429f, 331f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
 
-            listaInimigos.add(new InimigoBase(3, 10, 100, 609f, 863f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 189f, 934f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 531f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 898f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 1150f, 321f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 1347f, 384f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(3, 10, 100, 1091f, 1035f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            // Inimigos Parados (Tipo 3 -> alterado para movimento 0)
+            listaInimigos.add(new InimigoBase(3, 10, 100, 609f, 863f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 189f, 934f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 531f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 898f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1150f, 321f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1347f, 384f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1091f, 1035f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1104f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1263f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1441f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1633f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 387f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 352f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 200f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1128f, 414f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1216f, 542f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1666f, 765f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1123f, 1154f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa));
+            // Inimigos Parados (Tipo 4 -> mantido com movimento 0)
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1104f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1263f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1441f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1633f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 387f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 352f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 200f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1128f, 414f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1216f, 542f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1666f, 765f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(4, 10, 100, 1123f, 1154f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
             listaRubis.add(new Rubi(371.9883f, 508.9478f, 28.0F, 28.0F, personaje));
             listaRubis.add(new Rubi(1571.8608f, 350.97977f, 28.0F, 28.0F, personaje));
@@ -177,19 +185,13 @@ public class TelaTeste implements Screen {
         Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
         bau = new Bau(1800.0F, 200.0F, 80.0F, 50.0F, personaje, arrayParaOBau);
 
-
         listaPedrasQueCai.add(new PedraQueCai(994.35f, 478.58f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 287.52f));
         listaPedrasQueCai.add(new PedraQueCai(1218.65f, 887.79f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 668.12f));
 
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(479f, 159f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(449f, 192f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(129f, 130f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(733f, 224f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(925f, 161f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(746f, 95f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(676f, 32f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-        listaPedrasEmpurraveis.add(new PedraEmpurravel(353f, 516f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(1186f, 220f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(1349f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(1544f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
+        listaPedrasEmpurraveis.add(new PedraEmpurravel(1736f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
     }
 
     private void drawInfo() {
@@ -266,7 +268,6 @@ public class TelaTeste implements Screen {
 
         handleResetButton();
 
-        // MODIFICADO: Agora atualiza e verifica a colisão passando por TODAS as pedras da lista
         for (PedraQueCai pedra : listaPedrasQueCai) {
             pedra.update(delta);
             if (pedra.isColidiuComPlayer()) {
@@ -312,7 +313,6 @@ public class TelaTeste implements Screen {
         drawInfo();
         drawHUD();
 
-        // MODIFICADO: Agora renderiza todas as pedras vermelhas que estão no Array
         for (PedraQueCai pedra : listaPedrasQueCai) {
             pedra.render(camera);
         }
@@ -355,7 +355,6 @@ public class TelaTeste implements Screen {
         mapa.dispose();
         personaje.dispose();
 
-        // MODIFICADO: Dá o dispose correto em cada uma das pedras da lista
         for (PedraQueCai pedra : listaPedrasQueCai) {
             pedra.dispose();
         }
