@@ -20,53 +20,62 @@ public class Bau extends Item {
     private TextureRegion frameAtual;
 
     private Rectangle caixaBau;
-    private Rubi[] rubis;
+    private Rubi[] rubisFase1;
+    private Chave chave;
 
-    public Bau(float x, float y, float largura, float altura, PersonagemTeste personagem, Rubi[] rubis){
+    public Bau(float x, float y, float largura, float altura, PersonagemTeste personagem, Rubi[] rubisFase1, Chave chave){
         this.x = Math.round(x / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
         this.y = Math.round(y / MapaTeste.TAMANHO_BLOCO) * MapaTeste.TAMANHO_BLOCO;
         this.largura = largura;
         this.altura = altura;
         this.personagem = personagem;
-        this.rubis = rubis;
+        this.rubisFase1 = rubisFase1;
+        this.chave = chave;
         this.estaVisivel = false;
         this.foiAberto = false;
         this.caixaBau = new Rectangle();
 
         this.spriteBatch = new SpriteBatch();
-        this.spriteSheet = new Texture("assets/mapa/bauGR.png");
-        System.out.println("Texture do Bau carregada");
+        // Corrigido: nome do arquivo é "chests_byBatuhanK.png" (a textura "BauGR.png"
+        // tinha o caminho com letra errada e dimensões que não dividiam certo em frames).
+        this.spriteSheet = new Texture("assets/mapa/chests_byBatuhanK.png");
 
-        int colunasModo = 3;
-        int linesModo = 2;
-        int larguraFrame = spriteSheet.getWidth() / colunasModo;
-        int alturaFrame = spriteSheet.getHeight() / linesModo;
+        // Spritesheet de 320x96 -> 8 colunas x 2 linhas de 40x48 cada
+        int colunas = 8;
+        int linhas = 2;
+        int larguraFrame = spriteSheet.getWidth() / colunas;   // 40
+        int alturaFrame = spriteSheet.getHeight() / linhas;    // 48
 
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet, larguraFrame, alturaFrame);
 
-        this.bauFechado = tmp[1][0];
-        this.bauAberto  = tmp[1][2];
+        // Linha 0 = baús fechados, Linha 1 = baús abertos. Usamos a coluna 0 (madeira marrom).
+        this.bauFechado = tmp[0][0];
+        this.bauAberto  = tmp[1][0];
         this.frameAtual = bauFechado;
     }
 
     @Override
     public void update(float delta) {
         if (!foiAberto) {
-            int rubisColetados = 0;
-            for (Rubi rubi : rubis) {
-                if (rubi.isFoiColetado()){
-                    rubisColetados++;
+            // O baú só se torna visível quando os 5 rubis da fase 1 forem coletados
+            boolean todosRubisFase1Coletados = true;
+            for (Rubi rubi : rubisFase1) {
+                if (!rubi.isFoiColetado()) {
+                    todosRubisFase1Coletados = false;
+                    break;
                 }
             }
 
-            if (rubisColetados == 1) {
+            if (todosRubisFase1Coletados) {
                 estaVisivel = true;
+                chave.setVisivel(true);
             }
 
             if (estaVisivel) {
                 caixaBau.set(x, y, largura, altura);
 
-                if (caixaBau.overlaps(personagem.getCaixaPersonagem())){
+                // O baú só abre se o jogador encostar nele E já tiver coletado a chave
+                if (caixaBau.overlaps(personagem.getCaixaPersonagem()) && chave.isFoiColetado()) {
                     foiAberto = true;
                     frameAtual = bauAberto;
                 }

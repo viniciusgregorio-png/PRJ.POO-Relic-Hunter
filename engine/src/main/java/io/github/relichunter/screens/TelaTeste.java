@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.relichunter.Main;
 import io.github.relichunter.entidades.Bau;
+import io.github.relichunter.entidades.Chave;
 import io.github.relichunter.entidades.PedraEmpurravel;
 import io.github.relichunter.entidades.PedraQueCai;
 import io.github.relichunter.entidades.Rubi;
@@ -34,11 +35,13 @@ public class TelaTeste implements Screen {
     private BitmapFont font;
 
     private com.badlogic.gdx.utils.Array<PedraQueCai> listaPedrasQueCai;
-    private com.badlogic.gdx.utils.Array<Rubi> listaRubis;
+    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase1; // 5 rubis iniciais
+    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase2; // 7 rubis liberados pelo bau
     private com.badlogic.gdx.utils.Array<PedraEmpurravel> listaPedrasEmpurraveis;
 
-    private boolean jaLiberouNovosRubis = false;
+    private Chave chave;
     private Bau bau;
+    private boolean missaoCompleta = false;
 
     private com.badlogic.gdx.utils.Array<InimigoBase> listaInimigos;
 
@@ -77,7 +80,8 @@ public class TelaTeste implements Screen {
         camera = new OrthographicCamera();
         viewport = new StretchViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
 
-        listaRubis = new com.badlogic.gdx.utils.Array<Rubi>();
+        listaRubisFase1 = new com.badlogic.gdx.utils.Array<Rubi>();
+        listaRubisFase2 = new com.badlogic.gdx.utils.Array<Rubi>();
         listaInimigos = new com.badlogic.gdx.utils.Array<InimigoBase>();
         listaPedrasEmpurraveis = new com.badlogic.gdx.utils.Array<PedraEmpurravel>();
         listaPedrasQueCai = new com.badlogic.gdx.utils.Array<PedraQueCai>();
@@ -144,7 +148,8 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(2, 10, 100, 642f, 339f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
-            listaInimigos.add(new InimigoBase(1, 10, 100, 992f, 585f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+
+
 
 
 
@@ -158,47 +163,59 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
             // Inimigos Parados (Tipo 4 fogo)
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1104f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1263f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1441f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1633f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 387f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 352f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 200f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1128f, 414f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1216f, 542f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1666f, 765f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 1123f, 1154f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1142f, 28f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1484f, 31f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1681f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1306f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1411f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
-            listaInimigos.add(new InimigoBase(4, 10, 100, 1602f, 29f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 452f, 1085f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 322f, 1085f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
+            // Inimigos Parados (Tipo 6 - Fogo2
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1417f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1124f, 413f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1666f, 767f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 449f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 362f, 796f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 199f, 349f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 353f, 349f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1685.3f, 29.4f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1652.5f, 29.4f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1623.7f, 29.4f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1596.1f, 29.4f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1491.7f, 29.3f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1466.5f, 29.1f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1428.6f, 28.5f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1304.2f, 28.8f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1266.3f, 28.8f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1146.3f, 29.3f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(6, 10, 100, 1116.9f, 29.3f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
 
 
 
+            // Fase 1: 5 rubis disponiveis desde o inicio do jogo
+            listaRubisFase1.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
+            listaRubisFase1.add(new Rubi(1571.8608f, 350.97977f, 28.0F, 28.0F, personaje));
+            listaRubisFase1.add(new Rubi(1438.9127f, 483.84586f, 28.0F, 28.0F, personaje));
+            listaRubisFase1.add(new Rubi(1859.375f, 284.1942f, 28.0F, 28.0F, personaje));
+            listaRubisFase1.add(new Rubi(1090.7507f, 1037.6539f, 28.0F, 28.0F, personaje));
 
-            listaRubis.add(new Rubi(371.9883f, 508.9478f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1571.8608f, 350.97977f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1438.9127f, 483.84586f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1859.375f, 284.1942f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1859.9249f, 1083.5735f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(1090.7507f, 1037.6539f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(284.9394f, 867.3809f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(35.106544f, 1217.3754f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(514.6874f, 1127.4712f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(252.12126f, 1117.4712f, 28.0F, 28.0F, personaje));
-            listaRubis.add(new Rubi(50f, 50f, 28.0F, 28.0F, personaje));
+
+            // Fase 2: 7 rubis liberados apos abrir o bau com a chave
+            listaRubisFase2.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(1859.9249f, 1083.5735f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(371.9883f, 508.9478f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(284.9394f, 867.3809f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(35.106544f, 1217.3754f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(514.6874f, 1127.4712f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(252.12126f, 1117.4712f, 28.0F, 28.0F, personaje));
+            listaRubisFase2.add(new Rubi(50f, 50f, 28.0F, 28.0F, personaje));
         }
 
-        Rubi[] arrayParaOBau = listaRubis.toArray(Rubi.class);
-        bau = new Bau(1838.0F, 55.0F, 50.0F, 50.0F, personaje, arrayParaOBau);
+        chave = new Chave(451.0f, 350.0f, 28.0F, 28.0F, personaje);
+
+        Rubi[] arrayRubisFase1 = listaRubisFase1.toArray(Rubi.class);
+        bau = new Bau(1838.0F, 55.0F, 50.0F, 50.0F, personaje, arrayRubisFase1, chave);
 
         listaPedrasQueCai.add(new PedraQueCai(994.35f, 478.58f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 287.52f));
         listaPedrasQueCai.add(new PedraQueCai(1218.65f, 887.79f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 668.12f));
@@ -215,7 +232,7 @@ public class TelaTeste implements Screen {
 
     private void drawInfo() {
         int rubisColetados = getTotalRubisColetados();
-        int rubisTotal = listaRubis.size;
+        int rubisTotal = listaRubisFase1.size + listaRubisFase2.size;
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -302,10 +319,26 @@ public class TelaTeste implements Screen {
             pedra.update(delta);
         }
 
-        for (Rubi rubi : listaRubis) {
+        for (Rubi rubi : listaRubisFase1) {
             rubi.update(delta);
         }
+
+        // Os rubis da fase 2 so existem (sao atualizados) depois do bau ser aberto
+        if (bau.isFoiAberto()) {
+            for (Rubi rubi : listaRubisFase2) {
+                rubi.update(delta);
+            }
+        }
+
+        chave.update(delta);
         bau.update(delta);
+
+        if (!missaoCompleta && bau.isFoiAberto() && getTotalRubisColetadosFase2() == listaRubisFase2.size) {
+            missaoCompleta = true;
+            musicaGame.stop();
+            game.setScreen(new EndGameScreen(game, getTotalRubisColetados()));
+            return;
+        }
 
         if (inimigosAtivos) {
             for (InimigoBase inimigo : listaInimigos) {
@@ -342,9 +375,17 @@ public class TelaTeste implements Screen {
             pedra.render(camera);
         }
 
-        for (Rubi rubi : listaRubis) {
+        for (Rubi rubi : listaRubisFase1) {
             rubi.render(camera);
         }
+
+        if (bau.isFoiAberto()) {
+            for (Rubi rubi : listaRubisFase2) {
+                rubi.render(camera);
+            }
+        }
+
+        chave.render(camera);
         bau.render(camera);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
@@ -387,9 +428,13 @@ public class TelaTeste implements Screen {
         musicaGame.dispose();
         font.dispose();
 
-        for (Rubi rubi : listaRubis) {
+        for (Rubi rubi : listaRubisFase1) {
             rubi.dispose();
         }
+        for (Rubi rubi : listaRubisFase2) {
+            rubi.dispose();
+        }
+        chave.dispose();
         bau.dispose();
 
         for (InimigoBase inimigo : listaInimigos) {
@@ -398,8 +443,22 @@ public class TelaTeste implements Screen {
     }
 
     public int getTotalRubisColetados() {
+        return getTotalRubisColetadosFase1() + getTotalRubisColetadosFase2();
+    }
+
+    public int getTotalRubisColetadosFase1() {
         int total = 0;
-        for (Rubi rubi : listaRubis) {
+        for (Rubi rubi : listaRubisFase1) {
+            if (rubi.isFoiColetado()) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    public int getTotalRubisColetadosFase2() {
+        int total = 0;
+        for (Rubi rubi : listaRubisFase2) {
             if (rubi.isFoiColetado()) {
                 total++;
             }

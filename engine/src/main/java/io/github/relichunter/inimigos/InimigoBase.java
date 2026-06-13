@@ -67,6 +67,12 @@ public class InimigoBase {
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 64f;
                 break;
+            case 6:
+                caminhoTextura = "assets/inimigos/fire_spritesheet.png"; // Fogo Vermelho Intenso (variante alta)
+                totalFrames = 6;
+                this.larguraDesenho = 32f;
+                this.alturaDesenho = 96f;
+                break;
 
             default:
                 caminhoTextura = "assets/inimigos/snake_spritesheet.png"; // Cobra
@@ -82,7 +88,7 @@ public class InimigoBase {
         // Recorta os frames do spritesheet de acordo com o tamanho original da imagem
         for (int i = 0; i < totalFrames; i++) {
             // Se for o fogo, o corte de origem na imagem (png) é de 48px de altura
-            int frameAlturaOrigem = (tipoInimigo == 4) ? 48 : 32;
+            int frameAlturaOrigem = (tipoInimigo == 4 || tipoInimigo == 6) ? 48 : 32;
             frames[i] = new TextureRegion(spriteSheet, i * 32, 0, 32, frameAlturaOrigem);
         }
 
@@ -135,7 +141,7 @@ public class InimigoBase {
 
         // Se for o fogo, criamos uma caixa de colisão física vertical proporcional à sua nova altura
         float alturaFisica;
-        if (tipoInimigo == 4) {
+        if (tipoInimigo == 4 || tipoInimigo == 6) {
             alturaFisica = alturaDesenho - 8f; // Colisão quase em toda a altura da labareda
         } else {
             alturaFisica = alturaDesenho - (margemY * 2);
