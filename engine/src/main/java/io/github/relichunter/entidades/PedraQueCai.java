@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class PedraQueCai extends Obstaculo {
+public class PedraQueCai extends ObjetoJogo {
     private PersonagemTeste personagem;
     private boolean estaCaindo;
     private MapaTeste mapa;

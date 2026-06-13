@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class Bau extends Item {
+public class Bau extends ObjetoJogo {
     private boolean estaVisivel = false;
     private boolean foiAberto;
     private PersonagemTeste personagem;
@@ -36,11 +36,8 @@ public class Bau extends Item {
         this.caixaBau = new Rectangle();
 
         this.spriteBatch = new SpriteBatch();
-        // Corrigido: nome do arquivo é "chests_byBatuhanK.png" (a textura "BauGR.png"
-        // tinha o caminho com letra errada e dimensões que não dividiam certo em frames).
         this.spriteSheet = new Texture("assets/mapa/chests_byBatuhanK.png");
 
-        // Spritesheet de 320x96 -> 8 colunas x 2 linhas de 40x48 cada
         int colunas = 8;
         int linhas = 2;
         int larguraFrame = spriteSheet.getWidth() / colunas;   // 40
@@ -48,7 +45,6 @@ public class Bau extends Item {
 
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet, larguraFrame, alturaFrame);
 
-        // Linha 0 = baús fechados, Linha 1 = baús abertos. Usamos a coluna 0 (madeira marrom).
         this.bauFechado = tmp[0][0];
         this.bauAberto  = tmp[1][0];
         this.frameAtual = bauFechado;
@@ -57,7 +53,6 @@ public class Bau extends Item {
     @Override
     public void update(float delta) {
         if (!foiAberto) {
-            // O baú só se torna visível quando os 5 rubis da fase 1 forem coletados
             boolean todosRubisFase1Coletados = true;
             for (Rubi rubi : rubisFase1) {
                 if (!rubi.isFoiColetado()) {
@@ -74,7 +69,6 @@ public class Bau extends Item {
             if (estaVisivel) {
                 caixaBau.set(x, y, largura, altura);
 
-                // O baú só abre se o jogador encostar nele E já tiver coletado a chave
                 if (caixaBau.overlaps(personagem.getCaixaPersonagem()) && chave.isFoiColetado()) {
                     foiAberto = true;
                     frameAtual = bauAberto;

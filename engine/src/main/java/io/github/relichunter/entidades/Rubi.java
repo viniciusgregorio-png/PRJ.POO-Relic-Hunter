@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class Rubi extends Item {
+public class Rubi extends ObjetoJogo {
     private boolean foiColetado;
     private SpriteBatch spriteBatch;
     private Texture spriteSheet;

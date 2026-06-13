@@ -12,7 +12,6 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.relichunter.Main;
@@ -50,6 +49,9 @@ public class TelaTeste implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    private OrthographicCamera cameraHUD;
+    private Viewport viewportHUD;
+
     private final int LARGURA_VIRTUAL = 1200;
     private final int ALTURA_VIRTUAL = 900;
 
@@ -79,6 +81,12 @@ public class TelaTeste implements Screen {
 
         camera = new OrthographicCamera();
         viewport = new StretchViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, camera);
+        camera.zoom = 0.6f;
+
+        cameraHUD = new OrthographicCamera();
+        viewportHUD = new StretchViewport(LARGURA_VIRTUAL, ALTURA_VIRTUAL, cameraHUD);
+        cameraHUD.position.set(LARGURA_VIRTUAL / 2f, ALTURA_VIRTUAL / 2f, 0);
+        cameraHUD.update();
 
         listaRubisFase1 = new com.badlogic.gdx.utils.Array<Rubi>();
         listaRubisFase2 = new com.badlogic.gdx.utils.Array<Rubi>();
@@ -103,16 +111,12 @@ public class TelaTeste implements Screen {
                     personaje.setY(objY);
                     objetosCarregadosDoTiled = true;
                 } else if (nome.equalsIgnoreCase("snake_horizontal")) {
-                    // Tipo 1: Configurado com movimento 1 (Horizontal)
                     listaInimigos.add(new InimigoBase(1, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
                 } else if (nome.equalsIgnoreCase("snake_vertical_meio")) {
-                    // Tipo 3: Configurado agora com movimento 0 (Parado)
                     listaInimigos.add(new InimigoBase(3, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
                 } else if (nome.equalsIgnoreCase("snake_vertical_direita")) {
-                    // Tipo 5: Mantido com movimento 2 (Vertical)
                     listaInimigos.add(new InimigoBase(5, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
                 } else if (nome.equalsIgnoreCase("snake_parada")) {
-                    // Tipo 4: Configurado com movimento 0 (Parado)
                     listaInimigos.add(new InimigoBase(4, 10, 100, objX, objY, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
                 }
             }
@@ -124,7 +128,7 @@ public class TelaTeste implements Screen {
             personaje.setX(30);
             personaje.setY(30);
 
-// Inimigos Horizontais (Tipo 1 COBRA)
+            //horizontal tipo 1 cobra
             listaInimigos.add(new InimigoBase(1, 10, 100, 248f, 30f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
             listaInimigos.add(new InimigoBase(1, 10, 100, 1073f, 284f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
             listaInimigos.add(new InimigoBase(1, 10, 100, 1506f, 927f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
@@ -134,7 +138,8 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(1, 10, 100, 1395f, 670f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
             listaInimigos.add(new InimigoBase(1, 10, 100, 397f, 509f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
             listaInimigos.add(new InimigoBase(1, 10, 100, 373f, 1218f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 1));
-// Inimigos Verticais (Tipo 2 MORCEGO)
+
+            //vertical Tipo 2 morcego
             listaInimigos.add(new InimigoBase(2, 10, 100, 206f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 864f, 547f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 1027f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
@@ -149,11 +154,7 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(2, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
 
-
-
-
-
-            // Inimigos Parados (Tipo 3  aranha)
+            //tipo 3 aranha
             listaInimigos.add(new InimigoBase(3, 10, 100, 609f, 863f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 189f, 934f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 531f, 1023f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
@@ -162,7 +163,7 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(3, 10, 100, 1347f, 384f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
-            // Inimigos Parados (Tipo 4 fogo)
+            //tipo 4 fogo)
             listaInimigos.add(new InimigoBase(4, 10, 100, 387f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 352f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 200f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
@@ -170,7 +171,7 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(4, 10, 100, 452f, 1085f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 322f, 1085f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
-            // Inimigos Parados (Tipo 6 - Fogo2
+            //tipo 6 fogo 2
             listaInimigos.add(new InimigoBase(6, 10, 100, 1417f, 766f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(6, 10, 100, 1124f, 413f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(6, 10, 100, 1666f, 767f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
@@ -190,16 +191,12 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(6, 10, 100, 1146.3f, 29.3f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(6, 10, 100, 1116.9f, 29.3f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
 
-
-
-
             // Fase 1: 5 rubis disponiveis desde o inicio do jogo
             listaRubisFase1.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
             listaRubisFase1.add(new Rubi(1571.8608f, 350.97977f, 28.0F, 28.0F, personaje));
             listaRubisFase1.add(new Rubi(1438.9127f, 483.84586f, 28.0F, 28.0F, personaje));
             listaRubisFase1.add(new Rubi(1859.375f, 284.1942f, 28.0F, 28.0F, personaje));
             listaRubisFase1.add(new Rubi(1090.7507f, 1037.6539f, 28.0F, 28.0F, personaje));
-
 
             // Fase 2: 7 rubis liberados apos abrir o bau com a chave
             listaRubisFase2.add(new Rubi(1155.463f, 1038.0504f, 28.0F, 28.0F, personaje));
@@ -227,19 +224,16 @@ public class TelaTeste implements Screen {
         listaPedrasEmpurraveis.add(new PedraEmpurravel(1544f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
         listaPedrasEmpurraveis.add(new PedraEmpurravel(1736f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
         listaPedrasEmpurraveis.add(new PedraEmpurravel(1028f, 225f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
-
     }
 
     private void drawInfo() {
         int rubisColetados = getTotalRubisColetados();
         int rubisTotal = listaRubisFase1.size + listaRubisFase2.size;
 
-        batch.setProjectionMatrix(camera.combined);
+        // USA A PROJEÇÃO DA HUD: O texto não muda de tamanho nem sai do lugar
+        batch.setProjectionMatrix(cameraHUD.combined);
         batch.begin();
-        font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal,
-            camera.position.x - viewport.getWorldWidth() / 2f + 50,
-            camera.position.y + viewport.getWorldHeight() / 2f - 50
-        );
+        font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal, 50, ALTURA_VIRTUAL - 50);
         batch.end();
     }
 
@@ -247,10 +241,12 @@ public class TelaTeste implements Screen {
         if (!Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) return;
 
         Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        viewport.unproject(mouse);
+
+        // CONVERTE O CLIQUE USANDO O VIEWPORT DA HUD
+        viewportHUD.unproject(mouse);
 
         float hudX = RESET_BUTTON_X;
-        float hudY = viewport.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
+        float hudY = viewportHUD.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
 
         if (mouse.x >= hudX && mouse.x <= hudX + RESET_BUTTON_SIZE &&
             mouse.y >= hudY && mouse.y <= hudY + RESET_BUTTON_SIZE) {
@@ -262,9 +258,10 @@ public class TelaTeste implements Screen {
 
     private void drawHUD() {
         float hudX = RESET_BUTTON_X;
-        float hudY = viewport.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
+        float hudY = viewportHUD.getWorldHeight() - RESET_BUTTON_SIZE - RESET_BUTTON_Y;
 
-        batch.setProjectionMatrix(camera.combined);
+        // USA A PROJEÇÃO DA HUD: O botão fica fixo na tela seguindo o jogador
+        batch.setProjectionMatrix(cameraHUD.combined);
         batch.begin();
         batch.draw(resetButton, hudX, hudY, RESET_BUTTON_SIZE, RESET_BUTTON_SIZE);
         batch.end();
@@ -274,8 +271,8 @@ public class TelaTeste implements Screen {
         camera.position.x = personaje.getPosX() + 16f;
         camera.position.y = personaje.getPosY() + 16f;
 
-        float metadeLarguraCam = viewport.getWorldWidth() / 2f;
-        float metadeAlturaCam = viewport.getWorldHeight() / 2f;
+        float metadeLarguraCam = (viewport.getWorldWidth() * camera.zoom) / 2f;
+        float metadeAlturaCam = (viewport.getWorldHeight() * camera.zoom) / 2f;
 
         float limiteDireitoMapa = 60 * 32;
         float limiteSuperiorMapa = 40 * 32;
@@ -323,7 +320,6 @@ public class TelaTeste implements Screen {
             rubi.update(delta);
         }
 
-        // Os rubis da fase 2 so existem (sao atualizados) depois do bau ser aberto
         if (bau.isFoiAberto()) {
             for (Rubi rubi : listaRubisFase2) {
                 rubi.update(delta);
@@ -364,8 +360,13 @@ public class TelaTeste implements Screen {
 
         batch.end();
 
+        // ELEMENTOS DA HUD (Devem vir depois do mundo do jogo)
+        viewportHUD.apply(); // Muda para o foco da interface
         drawInfo();
         drawHUD();
+
+        // Volta ao viewport do jogo para renderizar as entidades corretamente no mapa
+        viewport.apply();
 
         for (PedraQueCai pedra : listaPedrasQueCai) {
             pedra.render(camera);
@@ -396,6 +397,7 @@ public class TelaTeste implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
+        viewportHUD.update(width, height, true); // O 'true' garante que a HUD fique centralizada
     }
 
     @Override

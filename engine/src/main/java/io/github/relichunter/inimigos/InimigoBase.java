@@ -8,9 +8,8 @@ import io.github.relichunter.screens.MapaTeste;
 import io.github.relichunter.screens.PersonagemTeste;
 
 public class InimigoBase {
-    // Separação do Tipo Visual (qual bicho é) do Tipo de Movimento!
-    protected int tipoInimigo; // 1 = Cobra, 2 = Morcego, 3 = Aranha, 4 = Fogo
-    protected int tipoMovimento; // 0 = Parado, 1 = Horizontal, 2 = Vertical
+    protected int tipoInimigo;
+    protected int tipoMovimento;
 
     protected float x, y, speed = 60f, direcaoX, direcaoY;
     protected Texture spriteSheet;
@@ -21,22 +20,15 @@ public class InimigoBase {
     protected MapaTeste mapa;
     protected Rectangle caixa = new Rectangle();
 
-    // Dimensões de renderização e colisão individuais do inimigo
     protected float larguraDesenho = 32f;
     protected float alturaDesenho = 32f;
 
-    /**
-     * CONSTRUTOR SOBRECARREGADO (Compatibilidade):
-     * Aceita as chamadas antigas de 8 parâmetros vindas da sua TelaTeste.java.
-     */
+
+
     public InimigoBase(int tipo, int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa) {
         this(tipo, forca, vida, x, y, limiteW, limiteH, mapa, (tipo == 2 || tipo == 3 || tipo == 5) ? 2 : 1);
     }
 
-    /**
-     * Construtor Principal:
-     * Inicializa a textura correta do inimigo e recorta os frames conforme o tamanho visual de cada um.
-     */
     public InimigoBase(int tipo, int forca, int vida, float x, float y, float limiteW, float limiteH, MapaTeste mapa, int tipoMovimento) {
         this.tipoInimigo = tipo;
         this.tipoMovimento = tipoMovimento;
@@ -47,35 +39,34 @@ public class InimigoBase {
         String caminhoTextura;
         int totalFrames = 4;
 
-        // Define dinamicamente a textura, dimensões e número de quadros de animação de cada tipo
         switch (tipoInimigo) {
             case 2:
-                caminhoTextura = "assets/inimigos/bat_spritesheet.png"; // Morcego
+                caminhoTextura = "assets/inimigos/bat_spritesheet.png";
                 totalFrames = 4;
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 32f;
                 break;
             case 3:
-                caminhoTextura = "assets/inimigos/spider_spritesheet.png"; // Aranha
+                caminhoTextura = "assets/inimigos/spider_spritesheet.png";
                 totalFrames = 6;
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 32f;
                 break;
             case 4:
-                caminhoTextura = "assets/inimigos/fire_spritesheet.png"; // Fogo Alto
+                caminhoTextura = "assets/inimigos/fire_spritesheet.png";
                 totalFrames = 6;
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 64f;
                 break;
             case 6:
-                caminhoTextura = "assets/inimigos/fire_spritesheet.png"; // Fogo Vermelho Intenso (variante alta)
+                caminhoTextura = "assets/inimigos/fire_spritesheet.png";
                 totalFrames = 6;
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 96f;
                 break;
 
             default:
-                caminhoTextura = "assets/inimigos/snake_spritesheet.png"; // Cobra
+                caminhoTextura = "assets/inimigos/snake_spritesheet.png";
                 totalFrames = 4;
                 this.larguraDesenho = 32f;
                 this.alturaDesenho = 32f;
@@ -85,16 +76,13 @@ public class InimigoBase {
         this.spriteSheet = new Texture(caminhoTextura);
         this.frames = new TextureRegion[totalFrames];
 
-        // Recorta os frames do spritesheet de acordo com o tamanho original da imagem
         for (int i = 0; i < totalFrames; i++) {
-            // Se for o fogo, o corte de origem na imagem (png) é de 48px de altura
             int frameAlturaOrigem = (tipoInimigo == 4 || tipoInimigo == 6) ? 48 : 32;
             frames[i] = new TextureRegion(spriteSheet, i * 32, 0, 32, frameAlturaOrigem);
         }
 
         this.frameAtual = frames[0];
 
-        // Configura as direções de movimento (Horizontal, Vertical ou Parado)
         configurarMovimento();
     }
 
@@ -124,7 +112,6 @@ public class InimigoBase {
             float proxX = x + (speed * delta * direcaoX);
             float proxY = y + (speed * delta * direcaoY);
 
-            // Ajuste dinâmico do teste de colisão com o mapa baseado na largura e altura do inimigo
             if (mapa.isParede(proxX + (larguraDesenho / 2f), proxY + (alturaDesenho / 2f))) {
                 direcaoX *= -1;
                 direcaoY *= -1;
@@ -134,15 +121,13 @@ public class InimigoBase {
             }
         }
 
-        // Define a caixa de colisão física com o jogador.
         float margemX = 4f;
         float margemY = 4f;
         float larguraFisica = larguraDesenho - (margemX * 2);
 
-        // Se for o fogo, criamos uma caixa de colisão física vertical proporcional à sua nova altura
         float alturaFisica;
         if (tipoInimigo == 4 || tipoInimigo == 6) {
-            alturaFisica = alturaDesenho - 8f; // Colisão quase em toda a altura da labareda
+            alturaFisica = alturaDesenho - 8f;
         } else {
             alturaFisica = alturaDesenho - (margemY * 2);
         }

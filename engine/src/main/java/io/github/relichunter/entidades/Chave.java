@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.relichunter.screens.PersonagemTeste;
 
-public class Chave extends Item {
+public class Chave extends ObjetoJogo {
     private float x;
     private float y;
     private float largura;

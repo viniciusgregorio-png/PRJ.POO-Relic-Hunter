@@ -35,7 +35,7 @@ public class PersonagemTeste {
     private float posX;
     private float posY;
 
-    private final float VELOCIDADE = 250f;
+    private final float VELOCIDADE = 120f;
     private float tempoAnimacao = 0;
     private final float VELOCIDADE_ANIMACAO = 0.12f;
     private boolean estaSeMovendo = false;
@@ -153,7 +153,7 @@ public class PersonagemTeste {
     }
 
     private boolean detectarColisao(float proximaX, float proximaY, MapaTeste mapa) {
-        // Guarda a posição atual antes do teste para analisar se estamos saindo de um bug
+        // guarda a posicao atual antes do teste para analisar se estamos saindo de um bug
         Rectangle caixaAtual = new Rectangle(posX + 4, posY + 4, caixaPersonagem.width, caixaPersonagem.height);
 
         caixaPersonagem.setPosition(proximaX + 4, proximaY + 4);
