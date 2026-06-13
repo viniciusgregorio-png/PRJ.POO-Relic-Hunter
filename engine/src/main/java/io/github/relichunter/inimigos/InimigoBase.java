@@ -136,7 +136,6 @@ public class InimigoBase {
     }
 
     public void render(SpriteBatch batch) {
-        // Renderiza o frame usando as proporções de tamanho de desenho configuradas no construtor
         batch.draw(frameAtual, x, y, larguraDesenho, alturaDesenho);
     }
 

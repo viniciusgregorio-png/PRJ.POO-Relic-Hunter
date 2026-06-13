@@ -153,7 +153,6 @@ public class PersonagemTeste {
     }
 
     private boolean detectarColisao(float proximaX, float proximaY, MapaTeste mapa) {
-        // guarda a posicao atual antes do teste para analisar se estamos saindo de um bug
         Rectangle caixaAtual = new Rectangle(posX + 4, posY + 4, caixaPersonagem.width, caixaPersonagem.height);
 
         caixaPersonagem.setPosition(proximaX + 4, proximaY + 4);
@@ -176,16 +175,13 @@ public class PersonagemTeste {
                     caixaBloco.setPosition(xPixelBloco, yPixelBloco);
 
                     if (caixaPersonagem.overlaps(caixaBloco)) {
-                        // SISTEMA ANTI-TRAVAMENTO: Se o personagem JÁ ESTAVA dentro da parede
                         if (caixaAtual.overlaps(caixaBloco)) {
-                            // Calcula as sobreposições atual e nova
                             float overlapAtualX = Math.min(caixaAtual.x + caixaAtual.width, caixaBloco.x + caixaBloco.width) - Math.max(caixaAtual.x, caixaBloco.x);
                             float overlapAtualY = Math.min(caixaAtual.y + caixaAtual.height, caixaBloco.y + caixaBloco.height) - Math.max(caixaAtual.y, caixaBloco.y);
 
                             float overlapNovoX = Math.min(caixaPersonagem.x + caixaPersonagem.width, caixaBloco.x + caixaBloco.width) - Math.max(caixaPersonagem.x, caixaBloco.x);
                             float overlapNovoY = Math.min(caixaPersonagem.y + caixaPersonagem.height, caixaBloco.y + caixaBloco.height) - Math.max(caixaPersonagem.y, caixaBloco.y);
 
-                            // Se o novo movimento diminui a sobreposição total, significa que estamos SAINDO da parede. Permite andar!
                             if ((overlapNovoX + overlapNovoY) < (overlapAtualX + overlapAtualY)) {
                                 continue;
                             }

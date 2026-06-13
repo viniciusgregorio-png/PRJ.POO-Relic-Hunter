@@ -34,8 +34,8 @@ public class TelaTeste implements Screen {
     private BitmapFont font;
 
     private com.badlogic.gdx.utils.Array<PedraQueCai> listaPedrasQueCai;
-    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase1; // 5 rubis iniciais
-    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase2; // 7 rubis liberados pelo bau
+    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase1;
+    private com.badlogic.gdx.utils.Array<Rubi> listaRubisFase2;
     private com.badlogic.gdx.utils.Array<PedraEmpurravel> listaPedrasEmpurraveis;
 
     private Chave chave;
@@ -230,7 +230,6 @@ public class TelaTeste implements Screen {
         int rubisColetados = getTotalRubisColetados();
         int rubisTotal = listaRubisFase1.size + listaRubisFase2.size;
 
-        // USA A PROJEÇÃO DA HUD: O texto não muda de tamanho nem sai do lugar
         batch.setProjectionMatrix(cameraHUD.combined);
         batch.begin();
         font.draw(batch, "Rubis: " + rubisColetados + " / " + rubisTotal, 50, ALTURA_VIRTUAL - 50);
@@ -242,7 +241,6 @@ public class TelaTeste implements Screen {
 
         Vector3 mouse = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-        // CONVERTE O CLIQUE USANDO O VIEWPORT DA HUD
         viewportHUD.unproject(mouse);
 
         float hudX = RESET_BUTTON_X;
@@ -360,12 +358,10 @@ public class TelaTeste implements Screen {
 
         batch.end();
 
-        // ELEMENTOS DA HUD (Devem vir depois do mundo do jogo)
-        viewportHUD.apply(); // Muda para o foco da interface
+        viewportHUD.apply();
         drawInfo();
         drawHUD();
 
-        // Volta ao viewport do jogo para renderizar as entidades corretamente no mapa
         viewport.apply();
 
         for (PedraQueCai pedra : listaPedrasQueCai) {
