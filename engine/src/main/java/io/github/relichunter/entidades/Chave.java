@@ -2,6 +2,7 @@ package io.github.relichunter.entidades;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,7 +18,9 @@ public class Chave extends ObjetoJogo {
     private boolean estaVisivel;
     private SpriteBatch spriteBatch;
     private Texture spriteSheet;
+    private Animation<TextureRegion> animacaoChave;
     private TextureRegion frameChave;
+    private float stateTime;
     private Rectangle caixaChave = new Rectangle();
     private PersonagemTeste personagem;
 
@@ -34,7 +37,19 @@ public class Chave extends ObjetoJogo {
 
         this.spriteBatch = new SpriteBatch();
         this.spriteSheet = new Texture("assets/mapa/Chave.png");
-        this.frameChave = new TextureRegion(spriteSheet, 96, 0, 32, 32);
+
+        int totalFrames = 12;
+        int larguraFrame = spriteSheet.getWidth() / totalFrames; // 16
+        int alturaFrame = spriteSheet.getHeight();               // 35
+
+        TextureRegion[][] tmp = TextureRegion.split(spriteSheet, larguraFrame, alturaFrame);
+        TextureRegion[] frames = tmp[0]; // única linha, 12 frames
+
+        this.animacaoChave = new Animation<>(0.08f, frames);
+        this.animacaoChave.setPlayMode(Animation.PlayMode.LOOP);
+
+        this.stateTime = 0f;
+        this.frameChave = frames[0];
     }
 
     public void setVisivel(boolean visivel) {
@@ -48,6 +63,9 @@ public class Chave extends ObjetoJogo {
     @Override
     public void update(float delta) {
         if (!estaVisivel || foiColetado) return;
+
+        stateTime += delta;
+        frameChave = animacaoChave.getKeyFrame(stateTime, true);
 
         caixaChave.set(this.x + 6, this.y + 6, 16, 16);
         if (caixaChave.overlaps(personagem.getCaixaPersonagem())) {

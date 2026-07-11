@@ -155,6 +155,10 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(2, 10, 100, 642f, 339f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 512f, 329f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
             listaInimigos.add(new InimigoBase(2, 10, 100, 1809f, 169f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 11436f, 924f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 234f, 886f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+            listaInimigos.add(new InimigoBase(2, 10, 100, 213f, 124f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 2));
+
 
             listaInimigos.add(new InimigoBase(3, 10, 100, 609f, 863f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 189f, 934f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
@@ -163,6 +167,12 @@ public class TelaTeste implements Screen {
             listaInimigos.add(new InimigoBase(3, 10, 100, 1150f, 321f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 1347f, 384f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(3, 10, 100, 1859f, 963f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 307f, 124f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 123f, 124f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 775f, 156f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1690f, 476f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+            listaInimigos.add(new InimigoBase(3, 10, 100, 1354f, 707f + 15f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
+
 
             listaInimigos.add(new InimigoBase(4, 10, 100, 387f, 126f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
             listaInimigos.add(new InimigoBase(4, 10, 100, 352f, 348f, LARGURA_VIRTUAL, ALTURA_VIRTUAL, mapa, 0));
@@ -215,6 +225,8 @@ public class TelaTeste implements Screen {
         listaPedrasQueCai.add(new PedraQueCai(1218.65f, 887.79f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 668.12f));
         listaPedrasQueCai.add(new PedraQueCai(1154.50f, 1119.99f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 937.61f));
         listaPedrasQueCai.add(new PedraQueCai(1089.98f, 1120.16f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 928.80f));
+        listaPedrasQueCai.add(new PedraQueCai(1633.24f, 483.23f, 32.0F, 32.0F, personaje, mapa, ALTURA_VIRTUAL, 285.53f));
+
 
         listaPedrasEmpurraveis.add(new PedraEmpurravel(1186f, 220f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));
         listaPedrasEmpurraveis.add(new PedraEmpurravel(1349f, 221f, 32.0F, 32.0F, mapa, personaje, ALTURA_VIRTUAL));

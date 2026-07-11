@@ -25,7 +25,6 @@ public class InimigoBase {
     protected float offsetX = 0f;
     protected float offsetY = 0f;
 
-    // Variáveis da Hitbox
     protected float hitboxWidth = 24f;
     protected float hitboxHeight = 24f;
     protected float hitboxOffsetX = 0f;

@@ -2,6 +2,7 @@ package io.github.relichunter.entidades;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -16,8 +17,9 @@ public class Bau extends ObjetoJogo {
     private SpriteBatch spriteBatch;
     private Texture spriteSheet;
     private TextureRegion bauFechado;
-    private TextureRegion bauAberto;
+    private Animation<TextureRegion> animacaoAbertura;
     private TextureRegion frameAtual;
+    private float stateTime;
 
     private Rectangle caixaBau;
     private Rubi[] rubisFase1;
@@ -36,18 +38,32 @@ public class Bau extends ObjetoJogo {
         this.caixaBau = new Rectangle();
 
         this.spriteBatch = new SpriteBatch();
-        this.spriteSheet = new Texture("assets/mapa/chests_byBatuhanK.png");
+        this.spriteSheet = new Texture("mapa/BauGR.png");
 
-        int colunas = 8;
-        int linhas = 2;
-        int larguraFrame = spriteSheet.getWidth() / colunas;   // 40
-        int alturaFrame = spriteSheet.getHeight() / linhas;    // 48
+        // DEBUG - pode remover depois de confirmar as dimensões
+        System.out.println("BauGR -> Largura: " + spriteSheet.getWidth() + " | Altura: " + spriteSheet.getHeight());
+
+        int colunas = 3;
+        int linhas = 4;
+        int larguraFrame = spriteSheet.getWidth() / colunas;
+        int alturaFrame = spriteSheet.getHeight() / linhas;
+
+        // DEBUG - pode remover depois de confirmar as dimensões
+        System.out.println("Frame -> Largura: " + larguraFrame + " | Altura: " + alturaFrame);
 
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet, larguraFrame, alturaFrame);
 
-        this.bauFechado = tmp[0][0];
-        this.bauAberto  = tmp[1][0];
+        // Frames de abertura (coluna 0), de cima para baixo: fechado -> abrindo -> aberto
+        TextureRegion[] framesAbertura = new TextureRegion[] {
+            tmp[0][0], tmp[1][0], tmp[2][0], tmp[3][0]
+        };
+
+        this.bauFechado = framesAbertura[0];
+        this.animacaoAbertura = new Animation<>(0.15f, framesAbertura);
+        this.animacaoAbertura.setPlayMode(Animation.PlayMode.NORMAL); // toca uma vez e fica no último frame
+
         this.frameAtual = bauFechado;
+        this.stateTime = 0f;
     }
 
     @Override
@@ -71,14 +87,15 @@ public class Bau extends ObjetoJogo {
 
                 if (caixaBau.overlaps(personagem.getCaixaPersonagem()) && chave.isFoiColetado()) {
                     foiAberto = true;
-                    frameAtual = bauAberto;
+                    stateTime = 0f; // inicia a animação de abertura do zero
                 }
             }
+
+            frameAtual = bauFechado;
         } else {
             caixaBau.set(x, y, largura, altura);
-            if (frameAtual != bauAberto) {
-                frameAtual = bauAberto;
-            }
+            stateTime += delta;
+            frameAtual = animacaoAbertura.getKeyFrame(stateTime, false); // false = não dá loop, fica no último frame
         }
     }
 

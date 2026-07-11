@@ -23,7 +23,8 @@ public class Lwjgl3Launcher {
             Lwjgl3ApplicationConfiguration.getDisplayMode();
 
         configuration.useVsync(true);
-        configuration.setForegroundFPS(displayMode.refreshRate + 1);
+        configuration.setForegroundFPS(displayMode.refreshRate + 1
+        );
         configuration.setWindowedMode(1250, 768);
         configuration.setWindowIcon("Logo3(1).png", "Logo3(2).png", "Logo3(3).png", "Logo3(4).png");
 

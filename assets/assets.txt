@@ -6,7 +6,6 @@ mapa/1_Mine_Tileset_1.png
 mapa/BauGR.png
 mapa/Chave.png
 mapa/Crystals.png
-mapa/chests_byBatuhanK.png
 mapa/mapa.tmx
 mapa/pedra.png
 mapa/pedra_rolando.png
